@@ -1,0 +1,4 @@
+<launch>
+<param name="elektron_tower_name" value="/dev/ttyACM0"/>
+<node name="elektron_tower_effector" pkg="elektron_tower" type="elektron_tower_effector" output="screen"/>
+</launch>

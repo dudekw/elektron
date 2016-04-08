@@ -1,0 +1,19 @@
+<!-- For proper laser scan visualization in gazebo:
+	export LIBGL_ALWAYS_SOFTWARE=1
+--> 
+
+
+<launch>
+<arg name="base"/> 
+  <!-- load configuration -->
+  <rosparam command="load" file="$(find elektron_control)/config/elektron_control.yaml" />
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/$(arg base)" args="joint_state_controller"/>
+  <!--spawn controller -->
+ 
+<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="30.0" />
+<remap from="/joint_states" to="$(arg base)/joint_states"/>
+  </node>
+</launch>

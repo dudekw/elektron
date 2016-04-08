@@ -1,0 +1,25 @@
+<launch>
+  <arg name="laser"/>
+  <arg name="tower"/>
+   <arg name="base"/> 
+
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_$(arg tower).urdf.xacro' --check-order" />
+  <param name="robot_description" command="$(arg urdf_file)" />
+  
+  <!-- Gazebo model spawner -->
+  <node name="spawn_elektron_model" pkg="gazebo_ros" type="spawn_model"
+        args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model $(arg base)"/>
+    <!-- elektron control spawner -->
+ <include file="$(find elektron_control)/launch/$(arg base)_$(arg laser)_$(arg tower)_control.launch.xml">
+<arg name="base" value="$(arg base)"/>
+  </include>
+
+  <!-- Velocity muxer only in groovy wait for upgrade
+  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+  <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
+        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+    <param name="yaml_cfg_file" value="$(find elektron_bringup)/param/mux.yaml" />
+    <remap from="cmd_vel_mux/output" to="elektron/commands/velocity"/>
+  </node>
+ -->
+</launch>
