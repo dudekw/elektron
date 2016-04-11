@@ -215,20 +215,18 @@
 
 
   <gazebo>
-    <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
+  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/elektron</robotNamespace>
+<!--<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType> -->
+  </plugin>
+
+   <!-- <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>1000.0</updateRate>
       <interface:audio name="gazebo_ros_controller_manager_dummy_iface" />
     </controller:gazebo_ros_controller_manager>
-  </gazebo>
-<gazebo>
-  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-    <robotNamespace>/elektron</robotNamespace>
-<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-  </plugin>
 
 
-<!--
  <transmission name="tran_state_right_wheel_joint">
     <type>joint_state_controller/JointStateController</type>
     <joint name="base_link_right_wheel_joint">
@@ -251,13 +249,15 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+-->
+</gazebo>
 
   <transmission name="tran_effort_left_wheel_joint">
     <type>effort_controllers/JointPositionController</type>
     <joint name="base_link_left_wheel_joint">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
     </joint>
-    <actuator name="motorbase_link_left_wheel_joint">
+    <actuator name="motor_base_link_left_wheel_joint">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
@@ -268,15 +268,37 @@
     <joint name="base_link_right_wheel_joint">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
     </joint>
-    <actuator name="motorbase_link_right_wheel_joint">
+    <actuator name="motor_base_link_right_wheel_joint">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
 
--->
+  <transmission name="tran_vel_left_wheel_joint">
+    <type>effort_controllers/JointVelocityController</type>
+    <joint name="base_link_left_wheel_joint">
+      <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_base_link_left_wheel_joint">
+      <hardwareInterface>VelocityJointInterface</hardwareInterface>
 
-</gazebo>
+    </actuator>
+  </transmission>
+
+
+  <transmission name="tran_vel_right_wheel_joint">
+    <type>effort_controllers/JointVelocityController</type>
+    <joint name="base_link_right_wheel_joint">
+      <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_base_link_right_wheel_joint">
+      <hardwareInterface>VelocityJointInterface</hardwareInterface>
+
+    </actuator>
+  </transmission>
+
+
+
 	<gazebo>
 
 		<controller:gazebo_ros_p3d name="p3d_base_controller" plugin="libgazebo_ros_p3d.so">
@@ -291,7 +313,7 @@
 			<interface:position name="p3d_base_position"/>
 		</controller:gazebo_ros_p3d>
 
-		<!--
+		
 		<controller:differential_position2d name="controller1">
 			<update>100</update>
 			<leftJoint>base_link_right_wheel_joint</leftJoint>
@@ -313,7 +335,7 @@
 			<rpyOffsets>0 0 0</rpyOffsets>
 			<interface:position name="p3d_base_position"/>
 		</controller:gazebo_ros_p3d>
-		-->
+		
 
 		<controller:gazebo_ros_imu name="imu_controller" plugin="libgazebo_ros_imu.so">
 			<alwaysOn>true</alwaysOn>
@@ -321,7 +343,7 @@
 			<bodyName>base_link</bodyName>
 			<topicName>body_pose_ground_truth</topicName>
 			<xyzOffsets>25.7 25.7 0</xyzOffsets>
-			<!-- option to initialize odometry for fake localization-->
+			 option to initialize odometry for fake localization
 			<rpyOffsets>0 0 0</rpyOffsets>
 			<gaussianNoise>0.5</gaussianNoise>
 			<interface:position name="imu_position_iface"/>
