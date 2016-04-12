@@ -10,7 +10,7 @@
   <node name="spawn_elektron_model" pkg="gazebo_ros" type="spawn_model"
         args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model $(arg base)"/>
     <!-- elektron control spawner -->
- <include file="$(find elektron_control)/launch/$(arg base)_$(arg laser)_$(arg tower)_control.launch.xml">
+ <include file="$(find elektron_control)/launch/$(arg base)_$(arg tower)_control.launch.xml">
 <arg name="base" value="$(arg base)"/>
   </include>
 
