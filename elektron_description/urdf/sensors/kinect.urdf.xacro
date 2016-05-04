@@ -1,37 +1,34 @@
 <?xml version="1.0"?>
 <robot name="sensor_kinect" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find elektron_description)/urdf/elektron_gazebo.urdf.xacro"/>
-
-  <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
-
+<xacro:include filename="$(find elektron_description)/urdf/elektron_gazebo.urdf.xacro"/>
   
   <xacro:property name="kinect_cam_py" value="-0.0125"/>
   <!-- Parameterised in part by the values in turtlebot_properties.urdf.xacro -->
-  <xacro:macro name="sensor_kinect" params="parent">
-    <joint name="camera_rgb_joint" type="fixed">
-      <origin xyz="${kinect_px} ${kinect_py} ${kinect_pz}" rpy="${kinect_or} ${kinect_op} ${kinect_oy}"/>
+  <xacro:macro name="sensor_kinect" params="parent id">
+    <joint name="kinect_camera_rgb_joint_${id}" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="${parent}"/>
-      <child link="camera_rgb_frame" />
+      <child link="kinect_camera_rgb_frame_${id}" />
     </joint>
-    <link name="camera_rgb_frame"/>
+    <link name="kinect_camera_rgb_frame_${id}"/>
 
-    <joint name="camera_rgb_optical_joint" type="fixed">
+    <joint name="kinect_camera_rgb_optical_joint_${id}" type="fixed">
       <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-      <parent link="camera_rgb_frame" />
-      <child link="camera_rgb_optical_frame" />
+      <parent link="kinect_camera_rgb_frame_${id}" />
+      <child link="kinect_camera_rgb_optical_frame_${id}" />
     </joint>
-    <link name="camera_rgb_optical_frame"/>
+    <link name="kinect_camera_rgb_optical_frame_${id}"/>
 
-    <joint name="camera_joint" type="fixed">
+    <joint name="kinect_camera_joint_${id}" type="fixed">
       <origin xyz="-0.031 ${-kinect_cam_py} -0.016" rpy="0 0 0"/>
-      <parent link="camera_rgb_frame"/>
-      <child link="camera_link"/>
+      <parent link="kinect_camera_rgb_frame_${id}"/>
+      <child link="kinect_camera_link_${id}"/>
     </joint>  
-      <link name="camera_link">
+      <link name="kinect_camera_link_${id}">
       <visual>
        <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-         <mesh filename="package://elektron_description/meshes/sensors/kinect.dae"/>
+         <mesh filename="package://elektron_description/meshes/sensors/kinect/kinect.dae"/>
         </geometry>
       </visual>
   	  <collision>
@@ -52,22 +49,22 @@
     <!-- The fixed joints & links below are usually published by static_transformers launched by the OpenNi launch 
          files. However, for Gazebo simulation we need them, so we add them here.
          (Hence, don't publish them additionally!) -->
-	<joint name="camera_depth_joint" type="fixed">
+	<joint name="kinect_camera_depth_joint_${id}" type="fixed">
 	  <origin xyz="0 ${2 * -kinect_cam_py} 0" rpy="0 0 0" />
-	  <parent link="camera_rgb_frame" />
-	  <child link="camera_depth_frame" />
+	  <parent link="kinect_camera_rgb_frame_${id}" />
+	  <child link="kinect_camera_depth_frame_${id}" />
 	</joint>
-	<link name="camera_depth_frame"/>
+	<link name="kinect_camera_depth_frame_${id}"/>
 
-	<joint name="camera_depth_optical_joint" type="fixed">
+	<joint name="kinect_camera_depth_optical_joint_${id}" type="fixed">
 	  <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-	  <parent link="camera_depth_frame" />
-	  <child link="camera_depth_optical_frame" />
+	  <parent link="kinect_camera_depth_frame_${id}" />
+	  <child link="kinect_camera_depth_optical_frame_${id}" />
 	</joint>
-	<link name="camera_depth_optical_frame"/>
+	<link name="kinect_camera_depth_optical_frame_${id}"/>
 	
 	<!-- Kinect sensor for simulation -->
-	<turtlebot_sim_3dsensor/>
+	<elektron_sim_kinect id="${id}"/>
   </xacro:macro>
 
 </robot>

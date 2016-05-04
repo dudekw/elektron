@@ -9,7 +9,7 @@ TO DO
   <arg name="gui" default="true"/>
 <arg name="base" value="elektron"/> <!-- only elektron -->
   <arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
-  <arg name="tower" value="$(optenv ELEKTRON_TOWER NoTower)"/>  <!-- tower, NoTower  --> 
+  <arg name="tower" value="$(optenv ELEKTRON_TOWER NoTower)"/>  <!-- Tower, NoTower  --> 
  <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">

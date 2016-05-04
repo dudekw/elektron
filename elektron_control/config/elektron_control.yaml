@@ -54,9 +54,4 @@ elektron:
         max_velocity           : 1.7  # rad/s
         has_acceleration_limits: true
         max_acceleration       : 1.5  # rad/s^2
-  angular:
-    z:
-      has_velocity_limits    : true
-      max_velocity           : 1.7  # rad/s
-      has_acceleration_limits: true
-      max_acceleration       : 1.5  # rad/s^2
+

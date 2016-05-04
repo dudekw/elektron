@@ -4,6 +4,7 @@
 	xmlns:xacro="http://ros.org/wiki/fixme"
 	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
 	<property name="M_PI" value="3.14159"/>
+	<property name="elektron_control_input" value="diff_drive_controller" />
 
 	<property name="base_size_x" value="0.38" />
 	<property name="base_size_y" value="0.28" />
@@ -12,6 +13,15 @@
 	<property name="wheel_radius" value="0.05" />
 	<property name="wheel_length" value="0.02" />
 	<property name="caster_wheel_offset_y" value="0.1675" />
+  	<!-- include calibrated params -->
+    <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
+
+	<!-- INCLUDE SICK LMX100 LASER -->
+	<!-- <include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" />-->
+	
+	<!-- INCLUDE KINECT -->
+	<include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
+
 
 	<!-- ROBOT BASE DEFINITION -->
 	<link name="base_link">
@@ -99,15 +109,24 @@
 	<xacro:erratic_wheel suffix="right_rear" parent="base_link" reflect="-1" offset="-0.15"	m="0"/>
 
 
-	<!-- INCLUDE SICK LMX100 LASER -->
-	<!-- <include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" />-->
-	
-	<!-- INCLUDE KINECT -->
-	<include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
-	<sensor_kinect  parent="base_link"/>
+	<!-- ADD KINECT -->
+    
+    <joint name="bottom_kinect_joint" type="fixed">
+      <origin xyz="${kinect_px} ${kinect_py} ${kinect_pz}" rpy="${kinect_or} ${kinect_op} ${kinect_oy}"/>
+      <parent link="base_link"/>
+      <child link="bottom_kinect_link" />
+    </joint>
+    <link name="bottom_kinect_link"/>
 
-	<!-- add differentional drive to wheels -->
-	<gazebo>
+	<sensor_kinect parent="bottom_kinect_link" id="bottom"/>
+
+
+	<!-- SET gazebo-ROS CONTROL -->
+	<xacro:if value="${elektron_control_input == 'pid'}">
+		<elektron_PID_control_gazebo/>
+	</xacro:if>
+	<xacro:if value="${elektron_control_input == 'diff_drive_controller'}">
+		<gazebo>
 		<plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
 			<alwaysOn>true</alwaysOn>
 			<updateRate>100</updateRate>
@@ -122,57 +141,6 @@
 			<robotBaseFrame>base_link</robotBaseFrame>
 		</plugin>
 	</gazebo>
-
-		
-
-
-	<!-- SET gazebo-ROS CONTROL -->
-	<gazebo>
-	  	<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-	    	<robotNamespace>/elektron</robotNamespace>
-	  	</plugin>
-	</gazebo>
-	<!-- ADD position CONTROLLER - left wheel -->
-	<transmission name="tran_effort_left_wheel_joint">
-		<type>effort_controllers/JointPositionController</type>
-		<joint name="base_link_left_wheel_joint">
-			<hardwareInterface>EffortJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_base_link_left_wheel_joint">
-			<hardwareInterface>EffortJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
-	<!-- ADD position CONTROLLER - right wheel -->
-	<transmission name="tran_effort_right_wheel_joint">
-		<type>effort_controllers/JointPositionController</type>
-		<joint name="base_link_right_wheel_joint">
-			<hardwareInterface>EffortJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_base_link_right_wheel_joint">
-			<hardwareInterface>EffortJointInterface</hardwareInterface>
-      			<mechanicalReduction>1</mechanicalReduction>
-    		</actuator>
-  	</transmission>
-	<!-- ADD velocity CONTROLLER - left wheel -->
-  	<transmission name="tran_vel_left_wheel_joint">
-    		<type>effort_controllers/JointVelocityController</type>
-    		<joint name="base_link_left_wheel_joint">
-      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
-    		</joint>
-    		<actuator name="motor_base_link_left_wheel_joint">
-      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
-    		</actuator>
-  	</transmission>
-	<!-- ADD velocity CONTROLLER - right wheel -->
-	<transmission name="tran_vel_right_wheel_joint">
-		<type>effort_controllers/JointVelocityController</type>
-		<joint name="base_link_right_wheel_joint">
-     			<hardwareInterface>VelocityJointInterface</hardwareInterface>
-    		</joint>
-    		<actuator name="motor_base_link_right_wheel_joint">
-      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
-    		</actuator>
-  	</transmission>
+	</xacro:if>
 
 </robot>
