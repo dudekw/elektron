@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot name="elektron_control_gazebo" xmlns:xacro="http://ros.org/wiki/xacro">
+	<!-- SET gazebo-ROS CONTROL -->
+  <xacro:macro name="elektron_PID_control_gazebo">
+
+	<gazebo>
+	  	<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+	    	<robotNamespace>/elektron</robotNamespace>
+	  	</plugin>
+	</gazebo>
+	<!-- ADD position CONTROLLER - left wheel -->
+	<transmission name="tran_effort_left_wheel_joint">
+		<type>effort_controllers/JointPositionController</type>
+		<joint name="base_link_left_wheel_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor_base_link_left_wheel_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+	<!-- ADD position CONTROLLER - right wheel -->
+	<transmission name="tran_effort_right_wheel_joint">
+		<type>effort_controllers/JointPositionController</type>
+		<joint name="base_link_right_wheel_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor_base_link_right_wheel_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+      			<mechanicalReduction>1</mechanicalReduction>
+    		</actuator>
+  	</transmission>
+	<!-- ADD velocity CONTROLLER - left wheel -->
+  	<transmission name="tran_vel_left_wheel_joint">
+    		<type>effort_controllers/JointVelocityController</type>
+    		<joint name="base_link_left_wheel_joint">
+      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+    		</joint>
+    		<actuator name="motor_base_link_left_wheel_joint">
+      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+    		</actuator>
+  	</transmission>
+	<!-- ADD velocity CONTROLLER - right wheel -->
+	<transmission name="tran_vel_right_wheel_joint">
+		<type>effort_controllers/JointVelocityController</type>
+		<joint name="base_link_right_wheel_joint">
+     			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+    		</joint>
+    		<actuator name="motor_base_link_right_wheel_joint">
+      			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+    		</actuator>
+  	</transmission>
+  	  </xacro:macro>
+
+  </robot>

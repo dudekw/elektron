@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<robot name="elektron_tower" xmlns:xacro="http://ros.org/wiki/xacro">
+<xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
+<xacro:include filename="$(find elektron_description)/urdf/sensors/rgb_camera.urdf.xacro"/>
+<xacro:include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
+
+  <xacro:macro name="elektron_tower" params="parent camera_type">
+
+
+   <joint name="head_base_joint" type="fixed">
+      <origin xyz="${head_base_px} ${head_base_py} ${head_base_pz}" rpy="${head_base_or} ${head_base_op} ${head_base_oy}"/>
+      <parent link="${parent}"/>
+      <child link="head_base" />
+    </joint>
+    <link name="head_base"/>
+
+    <joint name="head_yaw_revolute_joint" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+     <!-- --> <axis xyz="0 0 1"/>
+      <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+      <parent link="head_base" />
+      <child link="head_bottom_revolute_link" />
+    </joint>
+    <link name="head_bottom_revolute_link"/>
+    <joint name="head_yaw_fixed_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="head_bottom_revolute_link" />
+      <child link="head_bottom_fixed_link" />
+    </joint>
+    <link name="head_bottom_fixed_link"/>
+
+
+
+    <joint name="head_pitch_revolute_joint" type="revolute">
+      <origin xyz="0 0 0.05" rpy="0 0 0" />
+      <axis xyz="0 1 0"/>
+      <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+      <parent link="head_bottom_fixed_link" />
+      <child link="head_upper_revolute_link" />
+    </joint>
+    <link name="head_upper_revolute_link"/>
+    <joint name="head_pitch_fixed_joint" type="fixed">
+      <origin xyz="0 0 0.05" rpy="0 0 0" />
+      <parent link="head_upper_revolute_link" />
+      <child link="head_upper_fixed_link" />
+    </joint>
+    <link name="head_upper_fixed_link"/>
+
+
+
+	<xacro:if value="${camera_type == 'kinect'}">
+		<sensor_kinect parent="head_upper_fixed_link" id="head"/>
+	</xacro:if>
+	<xacro:if value="${camera_type == 'rgb_camera'}">
+		<elektron_rgb_camera parent="head_upper_fixed_link"/>
+	</xacro:if>
+
+ <!--   <joint name="head_camera_joint" type="fixed">
+      <origin xyz="-0.05 0.0 0.05" rpy="0 0 0"/>
+      <parent link="head_upper_link"/>
+      <child link="head_camera_link"/>
+    </joint>  
+      <link name="head_camera_link">
+      <visual>
+       <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
+        <geometry>
+         <mesh filename="package://elektron_description/meshes/sensors/head_camera/head_camera.dae"/>
+        </geometry>
+      </visual>
+  	  <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  	    <geometry>
+  	      <box size="0.07271 0.27794 0.073"/>
+  	    </geometry>
+  	  </collision>
+      <inertial>
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
+                 iyy="0.000498940" iyz="0.0"
+                 izz="0.003879257" />
+      </inertial>
+    </link> -->
+
+  </xacro:macro>
+
+</robot>
