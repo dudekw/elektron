@@ -15,17 +15,17 @@
 	<property name="wheel_length" value="0.02" />
 	<property name="caster_wheel_offset_y" value="0.1675" />
 	<!-- INCLUDE SICK LMX100 LASER -->
-	<include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" />
+	<xacro:include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" />
 	<!-- INCLUDE KINECT -->
-	<include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
+	<xacro:include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
 	<!-- INCLUDE TOWER -->
-	<include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>
+	<xacro:include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>
   	<!-- include calibrated params -->
     <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
   	<!-- include gazebo control -->
 
-	<include filename="$(find elektron_control)/gazebo/elektron_gazebo_control.urdf.xacro"/>
-	<include filename="$(find elektron_control)/gazebo/tower_gazebo_control.urdf.xacro"/>
+	<xacro:include filename="$(find elektron_control)/gazebo/elektron_gazebo_control.urdf.xacro"/>
+	<xacro:include filename="$(find elektron_control)/gazebo/tower_gazebo_control.urdf.xacro"/>
 
 
 	<!-- ROBOT BASE DEFINITION -->

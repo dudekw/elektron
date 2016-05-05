@@ -18,7 +18,7 @@
 	<visual>
 		<origin rpy="0 0 0" xyz="0 0 0.0"/>
 		<geometry>
-			<mesh filename="package://elektron_description/meshes/sick_lms1xx.dae"/>
+			<mesh filename="package://elektron_description/meshes/sensors/laser/sick_lms1xx.dae"/>
 			<!--<box size="0.15 0.15 0.2"/>-->
 		</geometry>
 	</visual>

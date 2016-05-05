@@ -8,7 +8,7 @@ TO DO
 <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  /proc/acpi/battery/BAT0  -->
   <arg name="gui" default="true"/>
 <arg name="base" value="elektron"/> <!-- only elektron -->
-  <arg name="laser"    value="$(optenv ELEKTRON_LASER NoLaser)"/> <!--  Laser, NoLaser   -->
+  <arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
   <arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
   <arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR kinect)"/>  <!-- kinect, rgb  --> 
 <!-- <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>  --> 

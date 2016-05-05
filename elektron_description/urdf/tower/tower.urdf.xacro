@@ -78,12 +78,12 @@
 
 
 
-	<xacro:if value="${camera_type == 'kinect'}">
+	<xacro:if value="${camera_type}">
 		<sensor_kinect parent="head_upper_fixed_link_${id}" id="head"/>
 	</xacro:if>
-	<xacro:if value="${camera_type == 'rgb_camera'}">
+	<xacro:unless value="${camera_type}">
 		<elektron_rgb_camera parent="head_upper_fixed_link_${id}" id="head"/>
-	</xacro:if>
+	</xacro:unless>
 
  <!--   <joint name="head_camera_joint" type="fixed">
       <origin xyz="-0.05 0.0 0.05" rpy="0 0 0"/>
