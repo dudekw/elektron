@@ -4,55 +4,85 @@
 <xacro:include filename="$(find elektron_description)/urdf/sensors/rgb_camera.urdf.xacro"/>
 <xacro:include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
 
-  <xacro:macro name="elektron_tower" params="parent camera_type">
+  <xacro:macro name="elektron_tower" params="parent camera_type id">
 
 
-   <joint name="head_base_joint" type="fixed">
+   <joint name="head_base_joint_${id}" type="fixed">
       <origin xyz="${head_base_px} ${head_base_py} ${head_base_pz}" rpy="${head_base_or} ${head_base_op} ${head_base_oy}"/>
       <parent link="${parent}"/>
       <child link="head_base" />
     </joint>
-    <link name="head_base"/>
+    <link name="head_base">
+    	    	 <inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+   		</inertial>
+	</link>
 
-    <joint name="head_yaw_revolute_joint" type="revolute">
+    <joint name="head_yaw_revolute_joint_${id}" type="revolute">
       <origin xyz="0 0 0" rpy="0 0 0" />
      <!-- --> <axis xyz="0 0 1"/>
       <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
       <parent link="head_base" />
-      <child link="head_bottom_revolute_link" />
+      <child link="head_bottom_revolute_link_${id}" />
     </joint>
-    <link name="head_bottom_revolute_link"/>
-    <joint name="head_yaw_fixed_joint" type="fixed">
+    <link name="head_bottom_revolute_link_${id}">
+    	 <inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="1" />
+   		</inertial>
+	</link>
+    <joint name="head_yaw_fixed_joint_${id}" type="fixed">
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <parent link="head_bottom_revolute_link" />
-      <child link="head_bottom_fixed_link" />
+      <parent link="head_bottom_revolute_link_${id}" />
+      <child link="head_bottom_fixed_link_${id}" />
     </joint>
-    <link name="head_bottom_fixed_link"/>
+    <link name="head_bottom_fixed_link_${id}">
+    	<inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+   		</inertial>
+	</link>
 
 
 
-    <joint name="head_pitch_revolute_joint" type="revolute">
+    <joint name="head_pitch_revolute_joint_${id}" type="revolute">
       <origin xyz="0 0 0.05" rpy="0 0 0" />
       <axis xyz="0 1 0"/>
       <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
-      <parent link="head_bottom_fixed_link" />
-      <child link="head_upper_revolute_link" />
+      <parent link="head_bottom_fixed_link_${id}" />
+      <child link="head_upper_revolute_link_${id}" />
     </joint>
-    <link name="head_upper_revolute_link"/>
-    <joint name="head_pitch_fixed_joint" type="fixed">
-      <origin xyz="0 0 0.05" rpy="0 0 0" />
-      <parent link="head_upper_revolute_link" />
-      <child link="head_upper_fixed_link" />
+    <link name="head_upper_revolute_link_${id}">
+    	<inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+   		</inertial>
+	</link>
+    <joint name="head_pitch_fixed_joint_${id}" type="fixed">
+      <origin xyz="0.05 0 0.05" rpy="0 0 0" />
+      <parent link="head_upper_revolute_link_${id}" />
+      <child link="head_upper_fixed_link_${id}" />
     </joint>
-    <link name="head_upper_fixed_link"/>
+    <link name="head_upper_fixed_link_${id}">
+    	<inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+   		</inertial>
+	</link>
 
 
 
 	<xacro:if value="${camera_type == 'kinect'}">
-		<sensor_kinect parent="head_upper_fixed_link" id="head"/>
+		<sensor_kinect parent="head_upper_fixed_link_${id}" id="head"/>
 	</xacro:if>
 	<xacro:if value="${camera_type == 'rgb_camera'}">
-		<elektron_rgb_camera parent="head_upper_fixed_link"/>
+		<elektron_rgb_camera parent="head_upper_fixed_link_${id}" id="head"/>
 	</xacro:if>
 
  <!--   <joint name="head_camera_joint" type="fixed">

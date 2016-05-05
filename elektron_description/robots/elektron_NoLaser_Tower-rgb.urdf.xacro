@@ -18,14 +18,14 @@
 	<include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" /> -->
 	<!-- INCLUDE KINECT -->
 	<include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
-	<!-- INCLUDE TOWER 
-	<include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>-->
+	<!-- INCLUDE TOWER -->
+	<include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>
   	<!-- include calibrated params -->
     <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
   	<!-- include gazebo control -->
 
 	<include filename="$(find elektron_control)/gazebo/elektron_gazebo_control.urdf.xacro"/>
-	<!-- <include filename="$(find elektron_control)/gazebo/tower_gazebo_control.urdf.xacro"/> -->
+	<include filename="$(find elektron_control)/gazebo/tower_gazebo_control.urdf.xacro"/>
 
 
 	<!-- ROBOT BASE DEFINITION -->
@@ -129,8 +129,8 @@
 
 	<sensor_kinect parent="bottom_kinect_link" id="bottom"/>
 	<!-- ADD TOWER -->
-	<!-- <elektron_tower parent="base_link" camera_type="rgb_camera" id="1"/> camera_type avaliable: kinect | rgb_camera 
-	<tower_PID_control_gazebo/>-->
+	<elektron_tower parent="base_link" camera_type="rgb_camera" id="1"/> <!-- camera_type avaliable: kinect | rgb_camera -->
+	<tower_PID_control_gazebo/>
 
 	<!-- SET gazebo-ROS CONTROL -->
 	<xacro:if value="${elektron_control_input == 'pid'}">

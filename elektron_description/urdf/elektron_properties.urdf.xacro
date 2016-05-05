@@ -30,7 +30,7 @@
 	<property name="kinect_oy" value="0" />
 
   <property name="head_base_px" value="0.1" />
-  <property name="head_base_py" value="0.0" />  <!-- Y varies for different configurations. get sets in sensors_urdf -->
+  <property name="head_base_py" value="0.0" /> 
   <property name="head_base_pz" value="0.75"/>
   <property name="head_base_or" value="0" />
   <property name="head_base_op" value="0" />

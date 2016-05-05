@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot name="elektron_gazebo" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Microsoft Kinect / ASUS Xtion PRO Live for simulation -->
-  <xacro:macro name="elektron_sim_kinect" params="id">
-    <gazebo reference="kinect_camera_link_${id}">  
+  <xacro:macro name="elektron_sim_kinect" params="id reference">
+    <gazebo reference="${reference}">  
       <sensor type="depth" name="kinect_camera_${id}">
         <always_on>true</always_on>
         <update_rate>20.0</update_rate>
@@ -41,11 +41,11 @@
   </xacro:macro>
 
   <!-- head camera -->
-  <xacro:macro name="elektron_sim_cam_head">
-  <gazebo reference="camera_head_link">
-    <sensor type="camera" name="camera1">
+  <xacro:macro name="elektron_sim_cam_head" params="id reference frame">
+  <gazebo reference="${reference}">
+    <sensor type="camera" name="camera_${id}">
       <update_rate>30.0</update_rate>
-      <camera name="head">
+      <camera name="camera_${id}">
         <horizontal_fov>1.3962634</horizontal_fov>
         <image>
           <width>800</width>
@@ -65,13 +65,13 @@
           <stddev>0.007</stddev>
         </noise>
       </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <plugin name="camera_controller_${id}" filename="libgazebo_ros_camera.so">
         <alwaysOn>true</alwaysOn>
         <updateRate>0.0</updateRate>
-        <cameraName>elektron/camera_head</cameraName>
-        <imageTopicName>camera_head/image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_head/camera_info</cameraInfoTopicName>
-        <frameName>camera_link</frameName>
+        <cameraName>elektron/camera_${id}</cameraName>
+        <imageTopicName>/image_raw</imageTopicName>
+        <cameraInfoTopicName>/camera_info</cameraInfoTopicName>
+        <frameName>${frame}</frameName>
         <hackBaseline>0.07</hackBaseline>
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>

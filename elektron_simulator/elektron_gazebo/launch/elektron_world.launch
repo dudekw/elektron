@@ -8,12 +8,13 @@ TO DO
 <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  /proc/acpi/battery/BAT0  -->
   <arg name="gui" default="true"/>
 <arg name="base" value="elektron"/> <!-- only elektron -->
-  <arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
-  <arg name="tower" value="$(optenv ELEKTRON_TOWER NoTower)"/>  <!-- Tower, NoTower  --> 
- <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>
+  <arg name="laser"    value="$(optenv ELEKTRON_LASER NoLaser)"/> <!--  Laser, NoLaser   -->
+  <arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
+  <arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR kinect)"/>  <!-- kinect, rgb  --> 
+<!-- <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>  --> 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find elektron_gazebo)/worlds/elektron_world.world"/>
+    <arg name="world_name" value="$(find elektron_gazebo)/worlds/elektron_world.world"/> <!---->
 <arg name="gui" value="$(arg gui)" />
    <arg name="debug" value="false"/>
     <arg name="use_sim_time" value="true"/>
@@ -26,6 +27,7 @@ TO DO
     <arg name="base" value="$(arg base)"/>
     <arg name="laser" value="$(arg laser)"/>
     <arg name="tower" value="$(arg tower)"/>
+    <arg name="tower_sensor" value="$(arg tower_sensor)"/>
   </include>
    
 </launch>

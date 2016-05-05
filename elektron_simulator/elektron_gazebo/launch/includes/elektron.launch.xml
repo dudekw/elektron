@@ -1,16 +1,23 @@
 <launch>
   <arg name="laser"/>
   <arg name="tower"/>
-   <arg name="base"/> 
+  <arg name="tower_sensor"/>
+  <arg name="base"/> 
 
-  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_$(arg tower).urdf.xacro' --check-order" />
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_Tower-$(arg tower_sensor).urdf.xacro' --check-order" if="$(arg tower)"/>
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_NoTower.urdf.xacro' --check-order" unless="$(arg tower)"/>
   <param name="robot_description" command="$(arg urdf_file)" />
   
   <!-- Gazebo model spawner -->
   <node name="spawn_elektron_model" pkg="gazebo_ros" type="spawn_model"
         args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model $(arg base)"/>
     <!-- elektron control spawner -->
- <include file="$(find elektron_control)/launch/$(arg base)_control.launch.xml">
+
+ <include file="$(find elektron_control)/launch/$(arg base)_Tower_control.launch.xml" if="$(arg tower)">
+  <arg name="base" value="$(arg base)"/>
+  </include>
+ <include file="$(find elektron_control)/launch/$(arg base)_NoTower_control.launch.xml" unless="$(arg tower)">
+
 <arg name="base" value="$(arg base)"/>
   </include>
 

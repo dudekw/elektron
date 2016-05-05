@@ -6,7 +6,7 @@
   <!-- Parameterised in part by the values in turtlebot_properties.urdf.xacro -->
   <xacro:macro name="sensor_kinect" params="parent id">
     <joint name="kinect_camera_rgb_joint_${id}" type="fixed">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0.06 0 0.05" rpy="0 0 0"/>
       <parent link="${parent}"/>
       <child link="kinect_camera_rgb_frame_${id}" />
     </joint>
@@ -64,7 +64,7 @@
 	<link name="kinect_camera_depth_optical_frame_${id}"/>
 	
 	<!-- Kinect sensor for simulation -->
-	<elektron_sim_kinect id="${id}"/>
+	<elektron_sim_kinect id="${id}" reference="kinect_camera_link_${id}"/>
   </xacro:macro>
 
 </robot>
