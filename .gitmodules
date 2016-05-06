@@ -2,3 +2,13 @@
     path = gazebo_ros_pkgs
     url = https://github.com/ros-simulation/gazebo_ros_pkgs.git
     branch = indigo-devel
+[submodule "rapp-api"]
+    path = rapp-api
+    url = https://github.com/rapp-project/rapp-api.git
+    branch = robot-api
+[submodule "rapp-robots-api"]
+    path = rapp-robots-api
+    url = https://github.com/rapp-project/rapp-robots-api.git 
+    branch = cpp   
+
+
