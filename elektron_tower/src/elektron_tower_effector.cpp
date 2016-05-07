@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <sstream>
 #include <string.h>
-#include <elektron_tower/MoveTower.h>
+#include <elektron_msgs/MoveTower.h>
 #include <ros/console.h>
 
 int fd;
@@ -37,8 +37,8 @@ bool sendAngles( int yaw, int pitch){
 	return false;
 }
 
-bool moveTower(elektron_tower::MoveTower::Request  &req,
-         elektron_tower::MoveTower::Response &res)
+bool moveTower(elektron_msgs::MoveTower::Request  &req,
+         elektron_msgs::MoveTower::Response &res)
 {
 	res.status = sendAngles(req.yaw, req.pitch);
 }
