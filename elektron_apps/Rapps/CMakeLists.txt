@@ -1,13 +1,76 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(elektron_apps)
-add_subdirectory(Rapps)
+project(elektron_Rapps)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
+find_package(RappRobots REQUIRED)
+include_directories(${RAPP_ROBOTS_INCLUDE_DIRS})
+LINK_DIRECTORIES(${RAPP_ROBOTS_LIBRARY_DIRS})
 
+find_package(Rapp REQUIRED)
+MESSAGE(STATUS ${RAPP_INCLUDE_DIRS})
+include_directories(${RAPP_INCLUDE_DIRS})
+LINK_DIRECTORIES(${RAPP_LIBRARY_DIRS})
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
+# Get from arguments if Debug is requested
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_BUILD_TYPE Debug)
+    message(STATUS "Building: ${CMAKE_BUILD_TYPE} - ommit flag to change to `Release`")
+else()
+    set(CMAKE_BUILD_TYPE Release)
+    message(STATUS "Building: ${CMAKE_BUILD_TYPE} - add `-DCMAKE_BUILD_TYPE=Debug` to switch to `Debug`")
+endif()
+# Linux should be the default OS/Platform for RAPP::API
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # using GCC/Linux
+    message (STATUS "GCC/Linux" )
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
+        message(STATUS "COMPILER: g++ version >= 4.7 using C++11")  
+    elseif ()
+        message (FATAL_ERROR "g++ version >= 4.7 is required")
+    endif()
+    if (${STATIC_LIBSTD})
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=gnu++11 -Wall -fPIC -static-libstdc++")
+    else()
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=gnu++11 -Wall -fPIC")
+    endif()
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    # TODO: can somebody with a NAO test this?
+    if (${OPEN_NAO})
+        set(CMAKE_EXE_LINKER_FLAGS "-lc++ -lcxxrt")
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=gnu++11 -Wall -fPIC -static-libstdc++ -m32")
+    endif()
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mtune=native -march=native")
+    set(BUILD_SHARED_LIBS OFF)
+    message(STATUS "CXX Flags: " ${CMAKE_CXX_FLAGS})
+    message(STATUS "CXX Linker: " ${CMAKE_EXE_LINKER_FLAGS})
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    # using Clang
+    message (STATUS "Clang/OSX" )
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (CLANG_VERSION_MAJOR VERSION_GREATER 3 OR CLANG_VERSION_MAJOR VERSION_EQUAL 3)
+        message(STATUS "Info: Clang >= 3.0 using C++11")
+    elseif ()
+        message(FATAL_ERROR "Clang version >= 3.0 is required")
+    endif()
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -Wall")
+        message(STATUS "CXX Flags: " ${CMAKE_CXX_FLAGS})
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mtune=native -march=native")
+        set(BUILD_SHARED_LIBS OFF)
+        message(STATUS "CXX Linker: " ${CMAKE_EXE_LINKER_FLAGS})
+# Intel Compiler May run on Linux - Maybe we should support it
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    message (FATAL_ERROR "unsupported compiler")
+# We cannot support Microsoft Visual Studio - We cannot support Win32 platforms
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    message (FATAL_ERROR "unsupported compiler")
+endif()
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -108,7 +171,6 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
 
 ## Declare a C++ library
 # add_library(elektron_apps
@@ -121,16 +183,16 @@ catkin_package(
 # add_dependencies(elektron_apps ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(elektron_apps_node src/elektron_apps_node.cpp)
+ add_executable(elektron_nav_test src/navigation_test.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(elektron_apps_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+ add_dependencies(elektron_nav_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(elektron_apps_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(elektron_nav_test
+rapp_robot_navigation
+ )
 
 #############
 ## Install ##
@@ -147,11 +209,11 @@ catkin_package(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS elektron_apps elektron_apps_node
+ install(TARGETS elektron_nav_test
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
