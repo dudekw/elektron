@@ -21,7 +21,7 @@ import rospy
 import almath as m
 import numpy 
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
-from geometry_msgs.msg import PolygonStamped, Point32
+from geometry_msgs.msg import PolygonStamped, Point32, PointStamped
 
 import tf.transformations
 
@@ -153,7 +153,7 @@ class MoveElektronModule():
 	def rapp_move_joint_interface(self,joints, angles):
 		#self.unsubscribeToObstacle()
 		moveJoint = rospy.ServiceProxy('moveJoint', MoveJoint)
-		resp1 = moveJoint(joints, angles)
+		resp1 = moveJoint(joints, angles,0)
 		return resp1.status
 
 	def rapp_stop_move_interface(self):
@@ -184,7 +184,7 @@ class MoveElektronModule():
 
 	def handle_rapp_moveTo(self,req):
 		try:
-			if(canTransform("map", "base_link", rospy.Time())):
+			if(self.tl.canTransform("map", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
 
 				pose_req = geometry_msgs.PoseStamped()
@@ -230,7 +230,9 @@ class MoveElektronModule():
 
 		if pathFollowingStatus == "finished":
 			status = False
-
+		elif pathFollowingStatus == "transformation error":
+			print "Transformation error!!!!!!!!!!"
+			status = True			
 		else:
 			print "BUG BUG BUG BUG BUG BUG BUG BUG \n BUG BUG BUG BUG BUG BUG"
 			status = True
@@ -260,7 +262,7 @@ class MoveElektronModule():
 
 
 	def plannPath(self,req):
-		naoCurrentPosition = [req.start_x,req.start_y,req.start_theta]#self.getRobotCurrentPosition()
+		robotCurrentPosition = [req.start_x,req.start_y,req.start_theta]#self.getRobotCurrentPosition()
 		start = PoseStamped()
 		goal = PoseStamped()
 		start.header.seq = 0
@@ -269,9 +271,9 @@ class MoveElektronModule():
 		goal.header.stamp = rospy.Time.now()
 		start.header.frame_id = "/map"
 		goal.header.frame_id = "/map"
-		start.pose.position.x = req.start_x#naoCurrentPosition[0][0]
-		start.pose.position.y = req.start_y#naoCurrentPosition[0][1]
-		start.pose.position.z = 0#naoCurrentPosition[0][2]
+		start.pose.position.x = req.start_x#robotCurrentPosition[0][0]
+		start.pose.position.y = req.start_y#robotCurrentPosition[0][1]
+		start.pose.position.z = 0#robotCurrentPosition[0][2]
 		start_orientation_quaternion = tf.transformations.quaternion_from_euler(0,0,req.start_theta) 
 
 		start.pose.orientation.x = start_orientation_quaternion[0]
@@ -304,88 +306,93 @@ class MoveElektronModule():
 			print "i= ",i
 			print "liczba punktow: \n", len(path)
 			rospy.sleep(3)
-			naoCurrentPosition = self.getRobotCurrentPosition()
-			robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
-			if (len(path)-(i+1)*20<0.1):
-				point_number = len(path)-1
-			else:
-				point_number = (i+1)*20
+			robotCurrentPosition = self.getRobotCurrentPosition()
+			if (len(robotCurrentPosition) == 2):
+				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
+				if (len(path)-(i+1)*20<0.1):
+					point_number = len(path)-1
+				else:
+					point_number = (i+1)*20
 
 
-			nextPose = path[point_number]
-			nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
-			nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
-			print "[Path tracker] - getting to next point:\n ", point_number," / ", (len(path)-1)
-			print "start:\n ",naoCurrentPosition[0][0],naoCurrentPosition[0][1]
-			print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
+				nextPose = path[point_number]
+				nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
+				nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
+				print "[Path tracker] - getting to next point:\n ", point_number," / ", (len(path)-1)
+				print "start:\n ",robotCurrentPosition[0][0],robotCurrentPosition[0][1]
+				print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
 
-			x_A = naoCurrentPosition[0][0]
-			y_A = naoCurrentPosition[0][1]
-			robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
-			gamma = robot_orientation_euler[2]
-			x_B = nextPose.pose.position.x
-			y_B = nextPose.pose.position.y
-			AB = numpy.sqrt((x_A-x_B)*(x_A-x_B)+(y_A-y_B)*(y_A-y_B))
-			nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
+				x_A = robotCurrentPosition[0][0]
+				y_A = robotCurrentPosition[0][1]
+				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
+				gamma = robot_orientation_euler[2]
+				x_B = nextPose.pose.position.x
+				y_B = nextPose.pose.position.y
+				AB = numpy.sqrt((x_A-x_B)*(x_A-x_B)+(y_A-y_B)*(y_A-y_B))
+				nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
 
-			alpha = numpy.arctan2(y_B-y_A,x_B-x_A)
-			#dist_Nao_trajectory = numpy.sqrt(()*()+()*())
-			print "gamma|alpha\n", gamma," | ",alpha
-			print "gamma|alpha", gamma," | ",nextPoseOrientationZ
-			if abs(gamma)> abs(alpha):
-			 	theta = -1*(gamma - alpha)
-			elif abs(gamma)< abs(alpha):
-				theta = (alpha - gamma)
-			else:
-				theta =0
-			if abs(theta) > 3.14:
-				print"\n theta > 3.14\n"
-				theta = theta-(numpy.sign(theta)*2*numpy.pi)
-			print "nawrotka na AB"
-			print "theta= ",theta
-			#if abs(theta) > 0.15:
-			# check if next point is not too close to current robot pose
-			#                 rotation more then 20 deg and goal distance more then 0.08 m || next pose is the goal 
-			should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.08) or (point_number == len(path)-1)
-			if (should_move):
-				# rotate with velocity = 0.4 rad/sec 
-				thetaTime = abs(theta)/0.4
-				resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta))
-				#self.proxy_motion.move(0,0,0.3*numpy.sign(theta))
-				
-				#while bool(resp):
+				alpha = numpy.arctan2(y_B-y_A,x_B-x_A)
+				#dist_Nao_trajectory = numpy.sqrt(()*()+()*())
+				print "gamma|alpha\n", gamma," | ",alpha
+				print "gamma|alpha", gamma," | ",nextPoseOrientationZ
+				if abs(gamma)> abs(alpha):
+				 	theta = -1*(gamma - alpha)
+				elif abs(gamma)< abs(alpha):
+					theta = (alpha - gamma)
+				else:
+					theta =0
+				if abs(theta) > 3.14:
+					print"\n theta > 3.14\n"
+					theta = theta-(numpy.sign(theta)*2*numpy.pi)
+				print "nawrotka na AB"
+				print "theta= ",theta
+				#if abs(theta) > 0.15:
+				# check if next point is not too close to current robot pose
+				#                 rotation more then 20 deg and goal distance more then 0.08 m || next pose is the goal 
+				should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.08) or (point_number == len(path)-1)
+				if (should_move):
+					# rotate with velocity = 0.4 rad/sec 
+					thetaTime = abs(theta)/0.4
+					resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta))
+					#self.proxy_motion.move(0,0,0.3*numpy.sign(theta))
 					
-				thetaTime_now = 0
-				while (thetaTime-thetaTime_now)>0:
-					if self.obstacle_detected == True:
-						status = "obstacle"
-						print "AAAAAAAAAAAA"
-						break	
-					rospy.sleep(0.1)
-					
-					thetaTime_now = thetaTime_now + 0.1
-				self.rapp_stop_move_interface()
-				# move forward with velocity - 0.08 m/s
-				print "pojscie na AB"
-				move_X_time = AB/0.08
-				if self.obstacle_detected == False:
-					resp = self.rapp_move_vel_interface(0.08,0)
-		
-					move_X_time_now = 0
-					while (move_X_time-move_X_time_now)>0:
+					#while bool(resp):
+						
+					thetaTime_now = 0
+					while (thetaTime-thetaTime_now)>0:
 						if self.obstacle_detected == True:
 							status = "obstacle"
-							print "BBBBBB"
+							print "AAAAAAAAAAAA"
 							break	
 						rospy.sleep(0.1)
 						
-						move_X_time_now = move_X_time_now + 0.1
-					
+						thetaTime_now = thetaTime_now + 0.1
 					self.rapp_stop_move_interface()
-				# if an obstacle was detected during movement to this point break path following and return status
-				if self.obstacle_detected == True:
-					print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-					return status
+					# move forward with velocity - 0.08 m/s
+					print "pojscie na AB"
+					move_X_time = AB/0.08
+					if self.obstacle_detected == False:
+						resp = self.rapp_move_vel_interface(0.08,0)
+			
+						move_X_time_now = 0
+						while (move_X_time-move_X_time_now)>0:
+							if self.obstacle_detected == True:
+								status = "obstacle"
+								print "BBBBBB"
+								break	
+							rospy.sleep(0.1)
+							
+							move_X_time_now = move_X_time_now + 0.1
+						
+						self.rapp_stop_move_interface()
+					# if an obstacle was detected during movement to this point break path following and return status
+					if self.obstacle_detected == True:
+						print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+						return status
+			else:
+				print "can't transform base_link to map frame" 
+				status = "transformation error"
+				return status
 		# if an obstacle was detected break path following and return status
 		if self.obstacle_detected == True:
 			print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
@@ -393,8 +400,8 @@ class MoveElektronModule():
 		# if at goal position, rotate to the goal orientation
 		else:
 			print "nawrotka na kierunek koncowy"
-			naoCurrentPosition = self.getRobotCurrentPosition()
-			robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
+			robotCurrentPosition = self.getRobotCurrentPosition()
+			robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
 			print "last point orientation: \n", nextPoseOrientationZ
 			theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
 			if abs(theta2) > 3.14:
@@ -428,8 +435,8 @@ class MoveElektronModule():
 	# 		print "i= ",i
 	# 		print "liczba punktow: \n", len(path)
 	# 		rospy.sleep(3)
-	# 		naoCurrentPosition = self.getRobotCurrentPosition()
-	# 		robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
+	# 		robotCurrentPosition = self.getRobotCurrentPosition()
+	# 		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
 	# 		if (len(path)-(i+1)*20<0.1):
 	# 			point_number = len(path)-1
 	# 		else:
@@ -440,12 +447,12 @@ class MoveElektronModule():
 	# 		nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
 	# 		nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
 	# 		print "[Path tracker] - getting to next point:\n ", point_number," / ", (len(path)-1)
-	# 		print "start:\n ",naoCurrentPosition[0][0],naoCurrentPosition[0][1]
+	# 		print "start:\n ",robotCurrentPosition[0][0],robotCurrentPosition[0][1]
 	# 		print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
 
-	# 		x_A = naoCurrentPosition[0][0]
-	# 		y_A = naoCurrentPosition[0][1]
-	# 		robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
+	# 		x_A = robotCurrentPosition[0][0]
+	# 		y_A = robotCurrentPosition[0][1]
+	# 		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
 	# 		gamma = robot_orientation_euler[2]
 	# 		x_B = nextPose.pose.position.x
 	# 		y_B = nextPose.pose.position.y
@@ -457,12 +464,12 @@ class MoveElektronModule():
 	# 		nextPose_POSE.header.stamp = self.tl.getLatestCommonTime("map","base_link")
 	# 		print "time: ",self.tl.getLatestCommonTime("map","base_link")
 	# 		nextPose_POSE = nextPose
-	# 		# nextPose_POSE.pose.position.y = naoCurrentPosition[0][1]
-	# 		# nextPose_POSE.pose.position.z = naoCurrentPosition[0][2]
-	# 		# nextPose_POSE.pose.orientation.x = naoCurrentPosition[1][0]
-	# 		# nextPose_POSE.pose.orientation.y = naoCurrentPosition[1][1]
-	# 		# nextPose_POSE.pose.orientation.z = naoCurrentPosition[1][2]
-	# 		# nextPose_POSE.pose.orientation.w = naoCurrentPosition[1][3]
+	# 		# nextPose_POSE.pose.position.y = robotCurrentPosition[0][1]
+	# 		# nextPose_POSE.pose.position.z = robotCurrentPosition[0][2]
+	# 		# nextPose_POSE.pose.orientation.x = robotCurrentPosition[1][0]
+	# 		# nextPose_POSE.pose.orientation.y = robotCurrentPosition[1][1]
+	# 		# nextPose_POSE.pose.orientation.z = robotCurrentPosition[1][2]
+	# 		# nextPose_POSE.pose.orientation.w = robotCurrentPosition[1][3]
 	# 		# while not self.tl.canTransform("map","base_link",rospy.Time.now()):
 	# 		# 	rospy.sleep(1)
 	# 		if self.tl.canTransform("map","base_link",self.tl.getLatestCommonTime("map","base_link")):
@@ -554,8 +561,8 @@ class MoveElektronModule():
 	# 	# 	return status
 	# 	# else:
 	# 	# 	print "nawrotka na kierunek koncowy"
-	# 	# 	naoCurrentPosition = self.getRobotCurrentPosition()
-	# 	# 	robot_orientation_euler = tf.transformations.euler_from_quaternion(naoCurrentPosition[1])
+	# 	# 	robotCurrentPosition = self.getRobotCurrentPosition()
+	# 	# 	robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
 	# 	# 	print "last point orientation: \n", nextPoseOrientationZ
 	# 	# 	theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
 	# 	# 	if abs(theta2) > 3.14:
@@ -594,8 +601,9 @@ class MoveElektronModule():
 		#print "nao position",(nao_position)
 			return robot_position
 		else:
-			print "can't transform base_blink to map frame" 
-
+			print "can't transform base_link to map frame" 
+			robot_position = []
+			return robot_position
 	def getCameraCurrentPosition(self):
 		if self.tl.canTransform("map","rgb_head",rospy.Time()):
 			camera_position = self.tl.lookupTransform("map","rgb_head",rospy.Time())
@@ -629,7 +637,7 @@ class MoveElektronModule():
 
 	def handle_rapp_moveStop(self,req):
 		try:
-			status = rapp_stop_move_interface()
+			status = self.rapp_stop_move_interface()
 			self.unsubscribeToObstacle()
 		except Exception, ex:
 			print "[Move server] - Exception in rapp_moveStop service handling: \n %s" % str(ex)
@@ -648,127 +656,160 @@ class MoveElektronModule():
 		pointX = point[0]
 		pointY = point[1]
 		pointZ = point[2]
+		dest_point = PointStamped()
+		dest_point.header.frame_id = "map"
+		dest_point.point.x = point[0]
+		dest_point.point.y = point[1]
+		dest_point.point.z = point[2]
 
-		rospy.sleep(2)
-		nao_position = self.getRobotCurrentPosition()
-		robot_orientation_euler = tf.transformations.euler_from_quaternion(nao_position[1])
-		camera_Nao_position = self.tl.lookupTransform("base_link","cameraTop",rospy.Time())
-		camera_Map_position = self.tl.lookupTransform("map","cameraTop",rospy.Time())
-		camera_Map_orientation_euler = tf.transformations.euler_from_quaternion(camera_Map_position[1])
+		if(self.tl.canTransform("head_pitch_fixed","rgb_head", rospy.Time()) and self.tl.canTransform("head_pitch_revolute","rgb_head", rospy.Time()) and self.tl.canTransform("map","head_pitch_fixed", rospy.Time()) ):
 
-		camera_Nao_orientation_euler = tf.transformations.euler_from_quaternion(camera_Nao_position[1])
+			###
+			#  compute head pitch angle. Based on MMAR publication
+			###
+			point_in_head_pitch = tf.transformPoint("head_pitch_fixed", dest_point)
 
-		dist2D = numpy.sqrt((pointX - camera_Map_position[0][0])*(pointX - camera_Map_position[0][0])+(pointY - camera_Map_position[0][1])*(pointY - camera_Map_position[0][1]))
-		#    *  - point
-		#    |  }
-		#    |  }  h = pointZ - NaoCamera
-		#    o    - Nao camera
-		h = pointZ - camera_Map_position[0][2]#camera_position[2]-nao_position[0][2]
+			camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("head_pitch_fixed","rgb_head",rospy.Time())
+			camera_in_revolute_head_pitch_transform = self.tl.lookupTransform("head_pitch_revolute","rgb_head",rospy.Time())
 
-		#print "= ",robot_orientation_euler[2]
-		#print "torso h",nao_position[0][2]
-		gamma = camera_Map_orientation_euler[2]
-		blabla = camera_Nao_orientation_euler[2]
-		alpha = numpy.arctan2(pointY-camera_Map_position[0][1],pointX-camera_Map_position[0][0])
-		print "gamma = ",gamma, "alpha = ",alpha, "blabla = ",blabla
-		if abs(gamma)> abs(alpha):
-		 	theta = -1*(gamma - alpha)
-		elif abs(gamma)< abs(alpha):
-			theta = (alpha - gamma)
+			D = numpy.sqrt(camera_in_fixed_head_pitch_transform[0][0]*camera_in_fixed_head_pitch_transform[0][0]+camera_in_fixed_head_pitch_transform[0][2]*camera_in_fixed_head_pitch_transform[0][2]) 
+			C = numpy.sqrt(point_in_head.point.x*point_in_head.point.x + point_in_head.point.z*point_in_head.point.z)
+			gamma = numpy.arctan(camera_in_revolute_head_pitch_transform[0][2]/camera_in_revolute_head_pitch_transform[0][0])
+			beta = 180 - gamma
+			sin_sigma = (D/C) * numpy.sin(beta)
+			alpha = numpy.arctan2(point_in_head.point.z, point_in_head.point.x) + numpy.arctan2(numpy.sin(sigma),numpy.sqrt(1-sin_sigma*sin_sigma))
+			head_pitch = alpha + beta + gamma - 270*numpy.pi/180
+
+
+			###
+			#  compute head yaw angle. Based on MMAR publication
+			###
+			point_in_head_yaw = tf.transformPoint("head_yaw_fixed", dest_point)
+
+			head_yaw = numpy.arctan2(point_in_head_yaw[0][1], point_in_head_yaw[0][0])
+
+
+
+
+			# nao_position = self.getRobotCurrentPosition()
+			# robot_orientation_euler = tf.transformations.euler_from_quaternion(nao_position[1])
+
+			# camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("base_link","rgb_head",rospy.Time())
+			# camera_in_Map_transform = self.tl.lookupTransform("map","rgb_head",rospy.Time())
+			# camera_Map_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_Map_transform[1])
+
+			# camera_in_robot_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_fixed_head_pitch_transform[1])
+
+			# dist2D = numpy.sqrt((pointX - camera_in_Map_transform[0][0])*(pointX - camera_in_Map_transform[0][0])+(pointY - camera_in_Map_transform[0][1])*(pointY - camera_in_Map_transform[0][1]))
+			# #    *  - point
+			# #    |  }
+			# #    |  }  h = pointZ - NaoCamera
+			# #    o    - Nao camera
+			# h = pointZ - camera_in_Map_transform[0][2]#camera_position[2]-nao_position[0][2]
+
+
+			# gamma = camera_Map_orientation_euler[2]
+			# alpha = numpy.arctan2(pointY-camera_in_Map_transform[0][1],pointX-camera_in_Map_transform[0][0])
+			# print "gamma = ",gamma, "alpha = ",alpha
+			# if abs(gamma)> abs(alpha):
+			#  	theta = -1*(gamma - alpha)
+			# elif abs(gamma)< abs(alpha):
+			# 	theta = (alpha - gamma)
+			# else:
+			# 	theta =0
+			# if abs(theta) > 3.14:
+			# 	print"\n theta > 3.14\n"
+			# 	theta = theta-(numpy.sign(theta)*2*numpy.pi)
+			# print "theta = ", theta
+			# turn_camera_yaw = theta + camera_in_robot_orientation_euler[2]
+			# turn_camera_pitch = -numpy.arctan(h/dist2D) - robot_orientation_euler[1]
+
+			turnHeadAngles = [head_yaw,head_pitch]
+			return turnHeadAngles
 		else:
-			theta =0
-		if abs(theta) > 3.14:
-			print"\n theta > 3.14\n"
-			theta = theta-(numpy.sign(theta)*2*numpy.pi)
-		print "theta = ", theta
-		head_yaw = theta + camera_Nao_orientation_euler[2]#sign*(2*numpy.pi - (abs(theta) + abs(robot_orientation_euler[2])+abs(camera_orientation_euler[2])))
+			turnHeadAngles = []
+			print "[Cannot calculate turn head angles] - cannot transform frames"
+			return turnHeadAngles
 
-		head_pitch = -numpy.arctan(h/dist2D) - robot_orientation_euler[1]
-		turnHeadAngles = [head_yaw,head_pitch]
-		return turnHeadAngles
+
 
 	def handle_rapp_lookAtPoint(self,req):
 		pointX = req.pointX
 		pointY = req.pointY
 		pointZ = req.pointZ
-		# line = PolygonStamped()
-		# line_Pub = rospy.Publisher("line", PolygonStamped, queue_size=10)
 
-		# point1 = Point32()
-		# point2 = Point32()
-		# point1.x = camera_Map_position[0][0]
-		# point1.y = camera_Map_position[0][1]
-		# point1.z = camera_Map_position[0][2]
-		# point2.x = pointX
-		# point2.y = pointY
-		# point2.z = pointZ
-		# line.polygon.points= [point1,point2]
-		# line.header.frame_id = "map"
-		# line.header.seq = 0
-		# line.header.stamp = rospy.Time.now()
-		# # line.points.y = [4,4]
-		# # line.points.z = [4,4]
-		# line_Pub.publish(line)
-		# thetaTime = abs(theta)/0.4
-		# self.proxy_motion.post.move(0,0,0.4*numpy.sign(theta))
-		# rospy.sleep(thetaTime)
-		# self.proxy_motion.post.move(0,0,0)
-
-		turnHeadAngles = self.compute_turn_head_angles([pointX,pointY,pointZ])	
-		head_yaw = turnHeadAngles[0]
-		head_pitch = turnHeadAngles[1]
-		#define ranges     YAW    Pitch_min  Pitch_max
-		range_matrix = [-2.086017,-0.449073,0.330041,
-						-1.526988,-0.330041,0.200015,
-						-1.089958,-0.430049,0.300022,
-						-0.903033,-0.479965,0.330041,
-						-0.756077,-0.548033,0.370010,
-						-0.486074,-0.641951,0.422021,
-						0.000000,-0.671951,0.515047]
-		#check if pitch component can be reached by Nao
-		if not(head_pitch > range_matrix[19] and head_pitch < range_matrix[20]):
-			print "Nao cant reach the pitch angle"
-			status = True
-			return LookAtPointResponse(status)	
-		#check if Nao has to turn around to reach the point
-		if abs(head_yaw) < abs(range_matrix[0]):
-			canLookAtPoint_yaw = True
-		else:
-			canLookAtPoint_yaw = False
-
-		i=1
-		#search the matrix for pitch boundaries for the desired head yaw position 
-		while i <= 6 :
-			if abs(head_yaw) > abs(range_matrix[i*3]) and canLookAtPoint_yaw:
-				head_pitch_max = range_matrix[(i-1)*3+2]
-				head_pitch_min = range_matrix[(i-1)*3+1]
-				break
-			i+=1			
-
-
-			# Nao can reach head_yaw and head_pitch
-		if (head_pitch > head_pitch_min and head_pitch < head_pitch_max and canLookAtPoint_yaw):
-
-			self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch],0.2)
-			status = False
-
-			# Nao will rotate to be ahead the point in yaw direction, then he will look at it
-		else:
-			thetaTime = abs(head_yaw)/0.4
-			moveVel_trigger = self.rapp_move_vel_interface(0,0.4*numpy.sign(head_yaw))
-
-			rospy.sleep(thetaTime)
-			self.proxy_motion.post.move(0,0,0)
-			
-			turnHeadAngles = self.compute_turn_head_angles([pointX,pointY,pointZ])	
+		turnHeadAngles = self.compute_turn_head_angles([pointX,pointY,pointZ])
+		if (len(turnHeadAngles) == 2):
 			head_yaw = turnHeadAngles[0]
 			head_pitch = turnHeadAngles[1]
+			#define ranges  YAW      min        max
+			range_matrix_yaw = [-numpy.pi/2,numpy.pi/2]
+			#define ranges  PITCH      min        max
+			range_matrix_pitch = [-numpy.pi/2,numpy.pi/2]
 
-			self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch],0.2)
-			status = False	
+			#check if pitch component can be reached by robot
+			if not(head_pitch > range_matrix_pitch[0] and head_pitch < range_matrix_pitch[1]):
+				print "Robot cannot reach the pitch angle"
+				status = True
+				return LookAtPointResponse(status)	
+			#check if robot has to turn around to reach the point
+			if abs(head_yaw) < abs(range_matrix_yaw[0]):
+				canLookAtPoint_yaw = True
+			else:
+				canLookAtPoint_yaw = False
 
-		return LookAtPointResponse(status)	
-		
+			i=1
+			#search the matrix for pitch boundaries for the desired head yaw position 
+			while i <= 6 :
+				if abs(head_yaw) > abs(range_matrix[i*3]) and canLookAtPoint_yaw:
+					head_pitch_max = range_matrix[(i-1)*3+2]
+					head_pitch_min = range_matrix[(i-1)*3+1]
+					break
+				i+=1			
+
+
+				# Robot can reach head_yaw and head_pitch
+			if (head_pitch > range_matrix_pitch[0] and head_pitch < range_matrix_pitch[1] and canLookAtPoint_yaw):
+
+				self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch])
+				status = False
+
+				# Robot need rotate to be ahead of the point in yaw direction. Then he will look at it
+			else:
+
+				###
+				#  compute robot yaw angle. Based on MMAR publication
+				###
+				dest_point = PointStamped()
+				dest_point.header.frame_id = "map"
+				dest_point.point.x = pointX
+				dest_point.point.y = pointY
+				dest_point.point.z = pointZ
+				point_in_robot = tf.transformPoint("base_link", dest_point)
+
+				robot_yaw = numpy.arctan2(point_in_robot[0][1], point_in_robot[0][0])
+				
+				thetaTime = abs(robot_yaw)/0.4
+				req_vel = elektron_msgs.MoveVelRequest()
+				req_vel.velocity_x = 0
+				req_vel.velocity_y = 0
+				req_vel.velocity_theta = 0.4*numpy.sign(robot_yaw)
+				moveVel_trigger = self.handle_rapp_moveVel(req_vel)
+
+				rospy.sleep(thetaTime)
+				# req_stop = elektron_msgs.MoveStopRequest()
+				self.handle_rapp_moveStop()
+				
+				turnHeadAngles = self.compute_turn_head_angles([pointX,pointY,pointZ])	
+				head_yaw = turnHeadAngles[0]
+				head_pitch = turnHeadAngles[1]
+
+				status = self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch])
+			return LookAtPointResponse(status)	
+		else:
+			status = True	
+			print "[Cannot calculate turn head angles] - cannot transform frames"
+			return LookAtPointResponse(status)				
 
 # Testng SIGINT signal handler
 def signal_handler(signal, frame):
