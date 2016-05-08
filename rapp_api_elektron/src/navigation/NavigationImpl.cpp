@@ -199,22 +199,23 @@ NavigationImpl::~NavigationImpl() {
 	}
 
 	bool NavigationImpl::moveAlongPath(std::vector<rapp::object::PoseStamped> poses){
-
+			geometry_msgs::PoseStamped pose_ros;
 			nav_msgs::Path poses_ros;
-
-			for (uint32_t i=0; i < poses.size();i++){
-
-				poses_ros.poses.at(i).header.seq = poses.at(i).header.seq;
-				poses_ros.poses.at(i).header.frame_id = poses.at(i).header.frame_id;
-				poses_ros.poses.at(i).header.stamp.sec = poses.at(i).header.stamp.sec;
-				poses_ros.poses.at(i).header.stamp.nsec = poses.at(i).header.stamp.nsec;
-				poses_ros.poses.at(i).pose.position.x = poses.at(i).pose.position.x;
-				poses_ros.poses.at(i).pose.position.y = poses.at(i).pose.position.y;
-				poses_ros.poses.at(i).pose.position.z = poses.at(i).pose.position.z;
-				poses_ros.poses.at(i).pose.orientation.x = poses.at(i).pose.orientation.x;
-				poses_ros.poses.at(i).pose.orientation.y = poses.at(i).pose.orientation.y;
-				poses_ros.poses.at(i).pose.orientation.z = poses.at(i).pose.orientation.z;
-				poses_ros.poses.at(i).pose.orientation.w = poses.at(i).pose.orientation.w;
+			//poses_ros.poses;
+			poses_ros.poses.clear();
+			for (int i=0; i < poses.size();i++){
+				pose_ros.header.seq = poses.at(i).header.seq;
+				pose_ros.header.frame_id = poses.at(i).header.frame_id;
+				pose_ros.header.stamp.sec = poses.at(i).header.stamp.sec;
+				pose_ros.header.stamp.nsec = poses.at(i).header.stamp.nsec;
+				pose_ros.pose.position.x = poses.at(i).pose.position.x;
+				pose_ros.pose.position.y = poses.at(i).pose.position.y;
+				pose_ros.pose.position.z = poses.at(i).pose.position.z;
+				pose_ros.pose.orientation.x = poses.at(i).pose.orientation.x;
+				pose_ros.pose.orientation.y = poses.at(i).pose.orientation.y;
+				pose_ros.pose.orientation.z = poses.at(i).pose.orientation.z;
+				pose_ros.pose.orientation.w = poses.at(i).pose.orientation.w;
+				poses_ros.poses.push_back(pose_ros);
 			}
 
 
