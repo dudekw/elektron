@@ -6,6 +6,7 @@ project(elektron_base)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+rospy
 )
 
 ## System dependencies are found with CMake's conventions
@@ -146,10 +147,10 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ install(PROGRAMS
+   control_subsystem/scripts/move_server.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS elektron_base elektron_base_node
