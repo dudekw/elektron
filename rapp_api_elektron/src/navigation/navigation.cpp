@@ -29,7 +29,12 @@ navigation::~navigation() {
 	}
 	bool navigation::moveVel(float x, float y, float theta){
 		bool status;
-		status = pimpl->moveVel(x, y,  theta);		
+		status = pimpl->moveVel(x,theta);		
+		return status;
+	}
+	bool navigation::moveVel(float x, float theta){
+		bool status;
+		status = pimpl->moveVel(x,theta);		
 		return status;
 	}
 	// bool navigation::moveHead(float yaw,float pitch){
@@ -43,12 +48,14 @@ navigation::~navigation() {
 	bool navigation::moveJoint(std::vector<std::string> joint, std::vector<float> angle, float speed){
 		bool status = false;
 
-		static const std::string arr[] = { "Body","Head","LArm","LLeg","RLeg","RArm","HeadYaw","LShoulderPitch","LHipYawPitch","RHipYawPitch","RShoulderPitch", "HeadPitch","LShoulderRoll","LHipRoll","RHipRoll","RShoulderRoll", "LElbowYaw","LHipPitch","RHipPitch","RElbowYaw", "LElbowRoll","LKneePitch","RKneePitch","RElbowRoll", "LWristYaw","LAnklePitch","RAnklePitch","RWristYaw", "LHand","RAnkleRoll","LAnkleRoll","RHand"};
+   		std::cout << "\nElektron robot does not support joint movement with specified speed. Joints are being moved with default speed.\n";
+
+		static const std::string arr[] = { "head_yaw","head_pitch"};
 		std::vector<std::string> joints_map(arr, arr + sizeof(arr) / sizeof(arr[0]) );
 		std::sort (joints_map.begin(), joints_map.end());
 		for (unsigned int i=0; i<joint.size();i++){
 			if (std::binary_search (joints_map.begin(), joints_map.end(), joint.at(i))){
-				status = pimpl->moveJoint(joint, angle, speed);			
+				status = pimpl->moveJoint(joint, angle);			
 		 	}else{
 	    		std::cout << "\nInput joint/jointChain does not exist!\nAvaliable joints/jointChains are:\n";
 			    for (unsigned int i = 0; i < joints_map.size(); i++)
@@ -63,6 +70,29 @@ navigation::~navigation() {
 		}
 		return status;	
 	}
+	bool navigation::moveJoint(std::vector<std::string> joint, std::vector<float> angle){
+		bool status = false;
+
+		static const std::string arr[] = { "head_yaw","head_pitch"};
+		std::vector<std::string> joints_map(arr, arr + sizeof(arr) / sizeof(arr[0]) );
+		std::sort (joints_map.begin(), joints_map.end());
+		for (unsigned int i=0; i<joint.size();i++){
+			if (std::binary_search (joints_map.begin(), joints_map.end(), joint.at(i))){
+				status = pimpl->moveJoint(joint, angle);			
+		 	}else{
+	    		std::cout << "\nInput joint/jointChain does not exist!\nAvaliable joints/jointChains are:\n";
+			    for (unsigned int i = 0; i < joints_map.size(); i++)
+			    {
+			        std::cout << " " << joints_map.at(i) << ", ";
+			    }
+			        std::cout << "\n";
+
+	    		status = false;
+	    		break;
+		 	}
+		}
+		return status;	
+	}	
 	// bool navigation::removeStiffness(std::string joint){
 	// 	pimpl->removeStiffness(joint);		
 	// }

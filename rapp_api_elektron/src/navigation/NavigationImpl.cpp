@@ -40,13 +40,13 @@ NavigationImpl::~NavigationImpl() {
 
 	}
 
-	bool NavigationImpl::moveVel(float x, float y, float theta){	
+	bool NavigationImpl::moveVel(float x, float theta){	
 
 		client_moveVel = n->serviceClient<elektron_msgs::MoveVel>("rapp_moveVel");
 
 		  elektron_msgs::MoveVel srv;
 		  srv.request.velocity_x = x;
-		  srv.request.velocity_y = y;
+		  srv.request.velocity_y = 0;
 		  srv.request.velocity_theta = theta;
 		  if (client_moveVel.call(srv))
 		  {
@@ -94,27 +94,26 @@ NavigationImpl::~NavigationImpl() {
 	// 	    ROS_ERROR("Failed to call service moveHead"); 
 	// 	  }
 	// }
-	bool NavigationImpl::moveJoint(std::vector<std::string> joint, std::vector<float> angle, float speed){
+
+	bool NavigationImpl::moveJoint(std::vector<std::string> joint, std::vector<float> angle){
 		client_moveJoint = n->serviceClient<elektron_msgs::MoveJoint>("rapp_moveJoint");
 
 		elektron_msgs::MoveJoint srv;
-		//memcpy(&srv.request.joint_name, &joint, sizeof(joint));
-		//memcpy(&srv.request.joint_angle, &angle, sizeof(angle));
+
 		srv.request.joint_name = joint;
 		srv.request.joint_angle = angle;
-		srv.request.speeds = speed;
+		srv.request.speeds = 1;
 
 	 	if (client_moveJoint.call(srv))
 	 	  {
 	   	  return srv.response.status;
-	  	  	//	ROS_INFO_STREAM(srv.request.joint_name<<" position is: \n"<<srv.response.angle_now);
 	 	  }
 	 	else
 	 	  {
 	  	  	return false;
 	 	    ROS_ERROR("Failed to call service moveJoint"); 
 	 	  }
-    }	
+    }		
 	// bool NavigationImpl::removeStiffness(std::string joint){
 	// 	client_removeStiffness = n->serviceClient<elektron_msgs::RemoveStiffness>("rapp_removeStiffness");
 		

@@ -62,9 +62,9 @@ public:
 	ros::NodeHandle *n;
 	
 	bool moveTo(float x, float y, float theta);
-	bool moveVel(float x, float y, float theta);
+	bool moveVel(float x, float theta);
 	bool moveStop();
-	bool moveJoint(std::vector<std::string> joint, std::vector<float> angle, float speed);
+	bool moveJoint(std::vector<std::string> joint, std::vector<float> angle);
 	bool takePredefinedPosture(std::string posture, float speed);
 	bool lookAtPoint(float x, float y, float z);
 	bool moveAlongPath(std::vector<rapp::object::PoseStamped> poses);
