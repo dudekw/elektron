@@ -18,14 +18,12 @@ from elektron_msgs.msg import obstacleData
 import signal
 import sys, os
 import rospy
-import almath as m
 import numpy 
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from geometry_msgs.msg import PolygonStamped, Point32, PointStamped
 
 import tf.transformations
 
-import motion
 import threading 
 import geometry_msgs
 #from geometry_msgs import PoseStamped
@@ -47,7 +45,7 @@ class MoveElektronModule():
 	sound detection events
 	"""
 	
-	# Constructor of MoveNaoModule
+	# Constructor of MoveElektronModule
 	def __init__(self,name):
 		print "[Move server] - Acore Move Server initialization"
 		
@@ -55,7 +53,7 @@ class MoveElektronModule():
 		rospy.init_node('acore_move')
 		self.moduleName = name
 		
-		# Initialization of Naoqi modules and ROS services
+		# Checking existance of virtual receptors and effectors
 		self.checkSubsystems()
 		self.setVariables()
 
@@ -64,7 +62,7 @@ class MoveElektronModule():
 
 		print "[Move server] - Waits for clients ..."
 				
-	# Initialization of Naoqi modules
+	# Checking existance of virtual receptors and effectors
 	def checkSubsystems(self):
 		print "[Move server] - Checking existance of virtual receptors and effectors"
 
@@ -115,7 +113,7 @@ class MoveElektronModule():
 			print "[Move server] - Exception %s" % str(ex_lookAt)
 
 
-	# NAOqi Event subscribtion
+	# Event subscribtion
 	def subscribeToEvents(self):
 		#self.prox_memory.subscribeToEvent("ALMotion/Safety/MoveFailed", self.moduleName, "MoveCallback")
 		#self.prox_memory.subscribeToEvent("LeftBumperPressed", self.moduleName, "LeftBumperPressed")
@@ -150,10 +148,25 @@ class MoveElektronModule():
 		resp1 = takePosture(pose,speed)
 		return resp1.status
 
-	def rapp_move_joint_interface(self,joints, angles):
+	def rapp_move_tower_interface(self, angles, joint_names ):
 		#self.unsubscribeToObstacle()
-		moveJoint = rospy.ServiceProxy('moveJoint', MoveJoint)
-		resp1 = moveJoint(joints, angles,0)
+		print len(joint_names)
+		move_joint_req = MoveTowerRequest()
+		if (len(joint_names) == 2):
+			move_joint_req.yaw = angles[0]
+			move_joint_req.pitch = angles[1]
+			move_joint_req.moveJoints = ["yaw","pitch"]
+		elif (joint_names[0] == "head_yaw"):
+			move_joint_req.yaw = angles[0]
+			move_joint_req.pitch = angles[0]
+			move_joint_req.moveJoints = ["yaw"]
+		elif (joint_names[0] == "head_pitch"):
+			move_joint_req.yaw = angles[0]
+			move_joint_req.pitch = angles[0]
+			move_joint_req.moveJoints = ["pitch"]
+
+		moveJoint = rospy.ServiceProxy('moveTowerJoint', MoveTower)
+		resp1 = moveJoint(move_joint_req)
 		return resp1.status
 
 	def rapp_stop_move_interface(self):
@@ -629,7 +642,21 @@ class MoveElektronModule():
 
 	def handle_rapp_moveJoint(self,req):
 		try:
-			status = self.rapp_move_joint_interface(req.joint_name,req.joint_angle)
+			avaliable_joints=["head_yaw","head_pitch"]
+			moveJoints = []
+			i=0
+			while (i<len(req.joint_name)):
+				if(req.joint_name[i] in avaliable_joints):
+					moveJoints.append(req.joint_name[i])
+				i=i+1
+			if ("head_yaw" in moveJoints and ("head_pitch" in moveJoints)):
+				status = self.rapp_move_tower_interface([req.joint_angle[req.joint_name.index("head_yaw")],req.joint_angle[req.joint_name.index("head_pitch")]],["head_yaw","head_pitch"])
+			elif ("head_yaw" in moveJoints):
+				status = self.rapp_move_tower_interface([req.joint_angle[req.joint_name.index("head_yaw")]], ["head_yaw"])
+			elif ("head_pitch" in moveJoints):
+				status = self.rapp_move_tower_interface([req.joint_angle[req.joint_name.index("head_pitch")]], ["head_pitch"])
+			else:
+				print "Elektron doeas not support any of requested joints:<<%s" % req.joint_name
 		except Exception, ex:
 			print "[Move server] - Exception in rapp_moveJoint service handling: \n %s" % str(ex)
 			status = True
@@ -662,15 +689,15 @@ class MoveElektronModule():
 		dest_point.point.y = point[1]
 		dest_point.point.z = point[2]
 
-		if(self.tl.canTransform("head_pitch_fixed","rgb_head", rospy.Time()) and self.tl.canTransform("head_pitch_revolute","rgb_head", rospy.Time()) and self.tl.canTransform("map","head_pitch_fixed", rospy.Time()) ):
+		if(self.tl.canTransform("head_bottom_fixed_link_1","rgb_head", rospy.Time()) and self.tl.canTransform("head_upper_revolute_link_1","rgb_head", rospy.Time()) and self.tl.canTransform("map","head_pitch_fixed", rospy.Time()) ):
 
 			###
 			#  compute head pitch angle. Based on MMAR publication
 			###
-			point_in_head_pitch = tf.transformPoint("head_pitch_fixed", dest_point)
+			point_in_head_pitch = tf.transformPoint("head_upper_fixed_link_1", dest_point)
 
-			camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("head_pitch_fixed","rgb_head",rospy.Time())
-			camera_in_revolute_head_pitch_transform = self.tl.lookupTransform("head_pitch_revolute","rgb_head",rospy.Time())
+			camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("head_upper_fixed_link_1","rgb_head",rospy.Time())
+			camera_in_revolute_head_pitch_transform = self.tl.lookupTransform("head_upper_revolute_link_1","rgb_head",rospy.Time())
 
 			D = numpy.sqrt(camera_in_fixed_head_pitch_transform[0][0]*camera_in_fixed_head_pitch_transform[0][0]+camera_in_fixed_head_pitch_transform[0][2]*camera_in_fixed_head_pitch_transform[0][2]) 
 			C = numpy.sqrt(point_in_head.point.x*point_in_head.point.x + point_in_head.point.z*point_in_head.point.z)
@@ -684,7 +711,7 @@ class MoveElektronModule():
 			###
 			#  compute head yaw angle. Based on MMAR publication
 			###
-			point_in_head_yaw = tf.transformPoint("head_yaw_fixed", dest_point)
+			point_in_head_yaw = tf.transformPoint("head_bottom_fixed_link_1", dest_point)
 
 			head_yaw = numpy.arctan2(point_in_head_yaw[0][1], point_in_head_yaw[0][0])
 
@@ -771,7 +798,7 @@ class MoveElektronModule():
 				# Robot can reach head_yaw and head_pitch
 			if (head_pitch > range_matrix_pitch[0] and head_pitch < range_matrix_pitch[1] and canLookAtPoint_yaw):
 
-				self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch])
+				self.rapp_move_tower_joint_interface(["head_yaw", "head_pitch"],[head_yaw,head_pitch])
 				status = False
 
 				# Robot need rotate to be ahead of the point in yaw direction. Then he will look at it
@@ -804,7 +831,7 @@ class MoveElektronModule():
 				head_yaw = turnHeadAngles[0]
 				head_pitch = turnHeadAngles[1]
 
-				status = self.rapp_move_joint_interface(["Head"],[head_yaw,head_pitch])
+				status = self.rapp_move_tower_joint_interface(["head_yaw", "head_pitch"],[head_yaw,head_pitch])
 			return LookAtPointResponse(status)	
 		else:
 			status = True	
@@ -824,7 +851,6 @@ def main():
 		signal.signal(signal.SIGINT, signal_handler)
 		print "[Move server] - Press Ctrl + C to exit system correctly"
 		
-		global NaoMove
 		ElektronMove = MoveElektronModule("ElektronMove")
 
 		rospy.spin()
@@ -832,13 +858,13 @@ def main():
 	except (KeyboardInterrupt, SystemExit):
 		print "[Move server] - SystemExit Exception caught"
 		#unsubscribe()
-		myBroker.shutdown()
+
 		sys.exit(0)
 		
 	except Exception, ex:
 		print "[Move server] - Exception caught %s" % str(ex)
 		#unsubscribe()
-		myBroker.shutdown()
+
 		sys.exit(0)
 		
 if __name__ == "__main__":

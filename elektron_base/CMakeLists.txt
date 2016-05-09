@@ -149,6 +149,8 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
  install(PROGRAMS
    control_subsystem/scripts/move_server.py
+   control_subsystem/scripts/estimator_server.py
+   virtual_effectors/scripts/tower_controller.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
