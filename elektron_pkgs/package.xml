@@ -40,14 +40,14 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>elektron_apps</build_depend>
+  <build_depend>elektron_rapps</build_depend>
   <build_depend>elektron_base</build_depend>
   <build_depend>elektron_control</build_depend>
   <build_depend>elektron_description</build_depend>
   <build_depend>elektron_msgs</build_depend>
   <build_depend>elektron_navigation</build_depend>
   <build_depend>elektron_tower</build_depend>
-  <run_depend>elektron_apps</run_depend>
+  <run_depend>elektron_rapps</run_depend>
   <run_depend>elektron_base</run_depend>
   <run_depend>elektron_control</run_depend>
   <run_depend>elektron_description</run_depend>

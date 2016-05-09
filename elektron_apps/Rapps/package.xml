@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>elektron_Rapps</name>
+  <name>elektron_rapps</name>
   <version>0.0.0</version>
-  <description>The elektron_Rapps package</description>
+  <description>The elektron_rapps package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -44,6 +44,7 @@
   <run_depend>rapp-robots-api</run_depend>
   <build_depend>rapp-api</build_depend>
   <run_depend>rapp-api</run_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
