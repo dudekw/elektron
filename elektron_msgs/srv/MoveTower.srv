@@ -1,5 +1,6 @@
-int32 yaw
-int32 pitch
+float32 yaw
+float32 pitch
+string[] moveJoints
 ---
 byte status
 
