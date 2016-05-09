@@ -6,6 +6,7 @@ project(elektron_tower)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  tf
 #  std_msgs
 #message_generation
 )
@@ -103,15 +104,15 @@ catkin_package(
 # )
 
 ## Declare a cpp executable
-add_executable(elektron_tower_effector src/elektron_tower_effector.cpp)
+add_executable(elektron_tower_real_effector src/elektron_tower_real_effector.cpp)
 #add_executable(finder_naruszenie src/finder_naruszenie_ochrony.cpp src/cvBlobLib/Blob.cpp src/cvBlobLib/BlobContour.cpp src/cvBlobLib/BlobOperators.cpp src/cvBlobLib/BlobResult.cpp src/cvBlobLib/ComponentLabeling.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(convert_img_node convert_img_generate_messages_cpp)
-add_dependencies(elektron_tower_effector ${PROJECT_NAME}_generate_messages_cpp )
+add_dependencies(elektron_tower_real_effector ${PROJECT_NAME}_generate_messages_cpp )
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(elektron_tower_effector
+ target_link_libraries(elektron_tower_real_effector
    ${catkin_LIBRARIES}
  )
 # target_link_libraries(finder_naruszenie
