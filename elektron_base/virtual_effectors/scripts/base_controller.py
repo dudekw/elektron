@@ -11,7 +11,7 @@ __author__ = "Wojciech Dudek"
 # Importing services
 from elektron_msgs.srv import *
 from elektron_msgs.msg import obstacleData
-
+from geometry_msgs.msg import Twist
 # Importing core system functionality
 import signal
 import sys, os
@@ -39,7 +39,7 @@ class BaseEffectorModule():
 	"""
 	
 	# Constructor of MoveNaoModule
-	def __init__(self,name):
+	def __init__(self,name,use_sim):
 		print "[Base effector] - Virtual effector <<Base>> initialization"
 		
 		# Initialization of ROS node
@@ -48,7 +48,7 @@ class BaseEffectorModule():
 		
 		# Initialization of Naoqi modules and ROS services
 		self.checkSubsystems()
-		self.setVariables()
+		self.setVariables(use_sim)
 
 		self.openServices()
 
@@ -60,10 +60,17 @@ class BaseEffectorModule():
 		print "[Base effector] - Checking existance of real effectors -> not implemented"
 
 	# Setting variables
-	def setVariables(self):
+	def setVariables(self,use_sim):
 		print "[Base effector] - Setting variables"
 		self.moveJoint = rospy.ServiceProxy('moveVel', MoveTower)
-		self.use_sim = 1
+		if (use_sim == "0"):
+			topic = "/cmd_vel"
+		elif (use_sim == "1"):
+			topic = "/elektron/mobile_base_controller/cmd_vel"	
+		else:
+			print("wrong node initialization usage: base_controller <<use_simulation_real_base_effector>> (1 - simulation|| 0 - real elektron)")
+		self.pub_vel = rospy.Publisher(topic, Twist, queue_size=10)
+
 	def openServices(self):
 		try:
 			print "[Base effector] - setting services"
@@ -91,19 +98,11 @@ class BaseEffectorModule():
 ####
 
 	def rapp_move_vel_interface(self,req):
-		
-		if self.use_sim == 0:
-			topic = "/cmd_vel"
-		elif self.use_sim == 1:
-			topic = "/elektron/mobile_base_controller/cmd_vel"	
-		else:
-			print("wrong node initialization usage: base_controller <<use_simulation_real_base_effector>> (1 - simulation|| 0 - real elektron)")
-			status = True
-			return MoveVelResponse(status)
+
 		set_vel = Twist()
 		set_vel.linear.x = req.velocity_x
 		set_vel.angular.z = req.velocity_theta
-		pub.publish(set_vel)
+		self.pub_vel.publish(set_vel)
 		status = False
 		return MoveVelResponse(status)
 
@@ -119,9 +118,9 @@ def main(use_sim):
 	try:
 		signal.signal(signal.SIGINT, signal_handler)
 		print "[Base effector] - Press Ctrl + C to exit system correctly"
-		self.use_sim = use_sim
-		global TowerEffectorModule
-		ElektronBaseMove = BaseEffectorModule("ElektronBaseMove")
+		#self.use_sim = use_sim
+		global ElektronBaseMove
+		ElektronBaseMove = BaseEffectorModule("ElektronBaseMove",use_sim)
 
 		rospy.spin()
 	
