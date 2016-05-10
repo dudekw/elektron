@@ -151,6 +151,7 @@ include_directories(
    control_subsystem/scripts/move_server.py
    control_subsystem/scripts/estimator_server.py
    virtual_effectors/scripts/tower_controller.py
+   virtual_effectors/scripts/base_controller.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
