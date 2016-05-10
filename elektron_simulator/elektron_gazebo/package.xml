@@ -43,6 +43,7 @@
 <run_depend>gazebo5</run_depend>
 <run_depend>xacro</run_depend>
 <run_depend>elektron_control</run_depend>
+<run_depend>elektron_base</run_depend>
 <run_depend>elektron_description</run_depend>
 <run_depend>gazebo_ros_pkgs</run_depend>
   <!-- The export tag contains other, unspecified, tags -->

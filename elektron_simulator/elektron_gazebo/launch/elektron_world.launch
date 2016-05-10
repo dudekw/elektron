@@ -29,5 +29,9 @@ TO DO
     <arg name="tower" value="$(arg tower)"/>
     <arg name="tower_sensor" value="$(arg tower_sensor)"/>
   </include>
-   
+
+  <node name="control_subsystem_move_server" pkg="elektron_base" type="move_server.py" />
+  <node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
+  <node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
+  <node name="real_effector_tower_gazebo" pkg="elektron_gazebo" type="tower_real_effector.py" />
 </launch>
