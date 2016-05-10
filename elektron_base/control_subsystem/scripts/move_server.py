@@ -73,6 +73,8 @@ class MoveElektronModule():
 		self.GP_seq = -1
 		self.tl = tf.TransformListener(True, rospy.Duration(5.0))
 		self.sub_obstacle = None
+		self.transformerROS = tf.TransformerROS(True, rospy.Duration(5.0))
+		self.tf_br = tf.TransformBroadcaster()
 
 	def openServices(self):
 		try:
@@ -618,11 +620,11 @@ class MoveElektronModule():
 			robot_position = []
 			return robot_position
 	def getCameraCurrentPosition(self):
-		if self.tl.canTransform("map","rgb_head",rospy.Time()):
-			camera_position = self.tl.lookupTransform("map","rgb_head",rospy.Time())
+		if self.tl.canTransform("map","rgb_head_1",rospy.Time()):
+			camera_position = self.tl.lookupTransform("map","rgb_head_1",rospy.Time())
 			return camera_position
 		else:
-			print "can't transform rgb_head to map frame" 
+			print "can't transform rgb_head_1 to map frame" 
 
 	def handle_rapp_moveVel(self,req):
 
@@ -678,51 +680,80 @@ class MoveElektronModule():
 			status = True
 			print "[Move server] - Exception %s" % str(ex)
 		return TakePredefinedPostureResponse(status)	
+	def transformPoint(self,target_frame,ps, time):
+		r = PointStamped()
+		self.tl.waitForTransform(target_frame,ps.header.frame_id,time, rospy.Duration(5))
+		point_translation_upper,point_rotation_upper = self.tl.lookupTransform(target_frame,ps.header.frame_id,time)
+		transform_matrix = numpy.dot(tf.transformations.translation_matrix(point_translation_upper), tf.transformations.quaternion_matrix(point_rotation_upper))
+		xyz = tuple(numpy.dot(transform_matrix, numpy.array([ps.point.x, ps.point.y, ps.point.z, 1.0])))[:3] 
+		r.header.stamp = ps.header.stamp 
+		r.header.frame_id = target_frame 
+		r.point = geometry_msgs.msg.Point(*xyz) 	
+		return r	
 
 	def compute_turn_head_angles(self, point):
+		now = rospy.Time()
 		pointX = point[0]
 		pointY = point[1]
 		pointZ = point[2]
 		dest_point = PointStamped()
-		dest_point.header.frame_id = "map"
+		dest_point.header.frame_id = "/map"
+		dest_point.header.seq = 0
+		dest_point.header.stamp = now
 		dest_point.point.x = point[0]
 		dest_point.point.y = point[1]
 		dest_point.point.z = point[2]
 
-		if(self.tl.canTransform("head_bottom_fixed_link_1","rgb_head", rospy.Time()) and self.tl.canTransform("head_upper_revolute_link_1","rgb_head", rospy.Time()) and self.tl.canTransform("map","head_pitch_fixed", rospy.Time()) ):
+		self.tf_br.sendTransform(point, [0,0,0,1],
+                                         rospy.Time.now(), "POINT", "/map")
+
+		if(self.tl.canTransform("head_bottom_fixed_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_revolute_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_fixed_link_1", "map", now) and self.tl.canTransform("head_upper_fixed_link_1", "rgb_head_1", now) ):
+			point_in_head_yaw = self.transformPoint("head_bottom_fixed_link_1", dest_point,now)
+
+			point_in_head_pitch = self.transformPoint("head_pitch_setting_link_1", dest_point,now)
 
 			###
 			#  compute head pitch angle. Based on MMAR publication
 			###
-			point_in_head_pitch = tf.transformPoint("head_upper_fixed_link_1", dest_point)
-
-			camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("head_upper_fixed_link_1","rgb_head",rospy.Time())
-			camera_in_revolute_head_pitch_transform = self.tl.lookupTransform("head_upper_revolute_link_1","rgb_head",rospy.Time())
-
+			
+			# point_in_head_pitch = self.transformerROS.transformPoint("head_upper_fixed_link_1", dest_point)
+			# print "point_in_head_pitch = ", point_in_head_pitch
+			camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("head_upper_fixed_link_1","rgb_head_1",now)
+			camera_in_revolute_head_pitch_transform = self.tl.lookupTransform("head_upper_revolute_link_1","rgb_head_1",now)
+			x_y_len = numpy.sqrt(point_in_head_pitch.point.x*point_in_head_pitch.point.x+point_in_head_pitch.point.y*point_in_head_pitch.point.y)
 			D = numpy.sqrt(camera_in_fixed_head_pitch_transform[0][0]*camera_in_fixed_head_pitch_transform[0][0]+camera_in_fixed_head_pitch_transform[0][2]*camera_in_fixed_head_pitch_transform[0][2]) 
-			C = numpy.sqrt(point_in_head.point.x*point_in_head.point.x + point_in_head.point.z*point_in_head.point.z)
-			gamma = numpy.arctan(camera_in_revolute_head_pitch_transform[0][2]/camera_in_revolute_head_pitch_transform[0][0])
-			beta = 180 - gamma
-			sin_sigma = (D/C) * numpy.sin(beta)
-			alpha = numpy.arctan2(point_in_head.point.z, point_in_head.point.x) + numpy.arctan2(numpy.sin(sigma),numpy.sqrt(1-sin_sigma*sin_sigma))
-			head_pitch = alpha + beta + gamma - 270*numpy.pi/180
+			# print "D = ", D
+			C = numpy.sqrt(x_y_len*x_y_len + point_in_head_pitch.point.z*point_in_head_pitch.point.z)
+			# print "C = ", C
+			gamma = - numpy.arctan(camera_in_revolute_head_pitch_transform[0][2]/camera_in_revolute_head_pitch_transform[0][0])
+			# print "gamma = ", gamma
 
+			beta = numpy.pi - gamma
+			# print "beta = ", beta
+			sin_sigma = (D/C) * numpy.sin(beta)
+			# print "sin_sigma = ", sin_sigma
+			alpha = numpy.arctan2(point_in_head_pitch.point.z, x_y_len) + numpy.arctan2(sin_sigma,numpy.sqrt(1-sin_sigma*sin_sigma))
+			# print "alpha = ", alpha
+			head_pitch = - alpha #+ beta + gamma - (270*numpy.pi)/180
+			# print "head_pitch = ", head_pitch
+			if (abs(head_pitch) < numpy.pi+0.01 and abs(head_pitch) > numpy.pi-0.01):
+				head_pitch = 0
 
 			###
 			#  compute head yaw angle. Based on MMAR publication
 			###
-			point_in_head_yaw = tf.transformPoint("head_bottom_fixed_link_1", dest_point)
 
-			head_yaw = numpy.arctan2(point_in_head_yaw[0][1], point_in_head_yaw[0][0])
-
-
-
+			head_yaw = numpy.arctan2(point_in_head_yaw.point.y, point_in_head_yaw.point.x)
+			if (abs(head_yaw) < numpy.pi+0.01 and abs(head_yaw) > numpy.pi-0.01):
+				head_yaw = 0
+			if (abs(head_yaw) < 0+0.01 and abs(head_yaw) > 0-0.01):
+				head_yaw = 0
 
 			# nao_position = self.getRobotCurrentPosition()
 			# robot_orientation_euler = tf.transformations.euler_from_quaternion(nao_position[1])
 
-			# camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("base_link","rgb_head",rospy.Time())
-			# camera_in_Map_transform = self.tl.lookupTransform("map","rgb_head",rospy.Time())
+			# camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("base_link","rgb_head_1",rospy.Time())
+			# camera_in_Map_transform = self.tl.lookupTransform("map","rgb_head_1",rospy.Time())
 			# camera_Map_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_Map_transform[1])
 
 			# camera_in_robot_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_fixed_head_pitch_transform[1])
@@ -752,6 +783,7 @@ class MoveElektronModule():
 			# turn_camera_pitch = -numpy.arctan(h/dist2D) - robot_orientation_euler[1]
 
 			turnHeadAngles = [head_yaw,head_pitch]
+			# print "turnHeadAngles = ", turnHeadAngles
 			return turnHeadAngles
 		else:
 			turnHeadAngles = []
@@ -787,18 +819,18 @@ class MoveElektronModule():
 
 			i=1
 			#search the matrix for pitch boundaries for the desired head yaw position 
-			while i <= 6 :
-				if abs(head_yaw) > abs(range_matrix[i*3]) and canLookAtPoint_yaw:
-					head_pitch_max = range_matrix[(i-1)*3+2]
-					head_pitch_min = range_matrix[(i-1)*3+1]
-					break
-				i+=1			
+			# while i <= 6 :
+			# 	if abs(head_yaw) > abs(range_matrix[i*3]) and canLookAtPoint_yaw:
+			# 		head_pitch_max = range_matrix[(i-1)*3+2]
+			# 		head_pitch_min = range_matrix[(i-1)*3+1]
+			# 		break
+			# 	i+=1			
 
 
 				# Robot can reach head_yaw and head_pitch
 			if (head_pitch > range_matrix_pitch[0] and head_pitch < range_matrix_pitch[1] and canLookAtPoint_yaw):
 
-				self.rapp_move_tower_joint_interface(["head_yaw", "head_pitch"],[head_yaw,head_pitch])
+				self.rapp_move_tower_interface([head_yaw,head_pitch],["head_yaw", "head_pitch"])
 				status = False
 
 				# Robot need rotate to be ahead of the point in yaw direction. Then he will look at it
@@ -812,9 +844,9 @@ class MoveElektronModule():
 				dest_point.point.x = pointX
 				dest_point.point.y = pointY
 				dest_point.point.z = pointZ
-				point_in_robot = tf.transformPoint("base_link", dest_point)
+				point_in_robot = self.transformPoint("base_link", dest_point,rospy.Time())
 
-				robot_yaw = numpy.arctan2(point_in_robot[0][1], point_in_robot[0][0])
+				robot_yaw = numpy.arctan2(point_in_robot.point.y, point_in_robot.point.x)
 				
 				thetaTime = abs(robot_yaw)/0.4
 				req_vel = elektron_msgs.MoveVelRequest()
@@ -831,7 +863,7 @@ class MoveElektronModule():
 				head_yaw = turnHeadAngles[0]
 				head_pitch = turnHeadAngles[1]
 
-				status = self.rapp_move_tower_joint_interface(["head_yaw", "head_pitch"],[head_yaw,head_pitch])
+				status = self.rapp_move_tower_interface([head_yaw,head_pitch],["head_yaw", "head_pitch"])
 			return LookAtPointResponse(status)	
 		else:
 			status = True	
