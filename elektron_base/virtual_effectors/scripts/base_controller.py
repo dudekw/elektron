@@ -43,7 +43,6 @@ class BaseEffectorModule():
 		print "[Base effector] - Virtual effector <<Base>> initialization"
 		
 		# Initialization of ROS node
-		rospy.init_node('acore_base_effector')
 		self.moduleName = name
 		
 		# Initialization of Naoqi modules and ROS services
@@ -70,15 +69,18 @@ class BaseEffectorModule():
 		else:
 			print("wrong node initialization usage: base_controller <<use_simulation_real_base_effector>> (1 - simulation|| 0 - real elektron)")
 		self.pub_vel = rospy.Publisher(topic, Twist, queue_size=10)
-
+		self.set_vel = Twist()
 	def openServices(self):
 		try:
 			print "[Base effector] - setting services"
 			print "[Base effector] - service - [moveVel]"
-			self.service_map = rospy.Service('moveVel', MoveVel, self.rapp_move_vel_interface)
+			self.service_map = rospy.Service('moveVel', MoveVel, self.rapp_set_vel_interface)
+			print "[Base effector] - service - [moveStop]"
+			self.service_map2 = rospy.Service('moveStop', MoveStop, self.rapp_stop_vel_interface)
+
 		except Exception, ex_map:
 			print "[Base effector] - Exception %s" % str(ex_map)
-
+			self.service_map2 = rospy.Service('moveStop', MoveStop, self.rapp_stop_vel_interface)
 	# Event subscribtion
 	# def subscribeToEvents(self):
 		#print "subscribing to events"
@@ -92,19 +94,24 @@ class BaseEffectorModule():
 			return sys.stdin.read(1)
 		finally:
 			termios.tcsetattr(fd, termios.TCSADRAIN, old)
-
+	def velPublisher(self):
+		self.pub_vel.publish(self.set_vel)
 ####
 ##  SERVECE HANDLERS
 ####
 
-	def rapp_move_vel_interface(self,req):
-
-		set_vel = Twist()
-		set_vel.linear.x = req.velocity_x
-		set_vel.angular.z = req.velocity_theta
-		self.pub_vel.publish(set_vel)
+	def rapp_set_vel_interface(self,req):
+		
+		self.set_vel.linear.x = req.velocity_x
+		self.set_vel.angular.z = req.velocity_theta
 		status = False
 		return MoveVelResponse(status)
+	def rapp_stop_vel_interface(self,req):
+		
+		self.set_vel.linear.x = 0
+		self.set_vel.angular.z = 0
+		status = False
+		return MoveStopResponse(status)
 
 # Testng SIGINT signal handler
 def signal_handler(signal, frame):
@@ -119,10 +126,13 @@ def main(use_sim):
 		signal.signal(signal.SIGINT, signal_handler)
 		print "[Base effector] - Press Ctrl + C to exit system correctly"
 		#self.use_sim = use_sim
+		rospy.init_node('acore_base_effector')
 		global ElektronBaseMove
 		ElektronBaseMove = BaseEffectorModule("ElektronBaseMove",use_sim)
-
-		rospy.spin()
+		rate = rospy.Rate(10)
+		while not rospy.is_shutdown():
+			ElektronBaseMove.velPublisher()
+			rate.sleep()
 	
 	except (KeyboardInterrupt, SystemExit):
 		print "[Base effector] - SystemExit Exception caught"

@@ -22,8 +22,7 @@ import numpy
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from geometry_msgs.msg import PolygonStamped, Point32, PointStamped
 
-import tf.transformations
-
+import tf
 import threading 
 import geometry_msgs
 #from geometry_msgs import PoseStamped
@@ -75,6 +74,7 @@ class MoveElektronModule():
 		self.sub_obstacle = None
 		self.transformerROS = tf.TransformerROS(True, rospy.Duration(5.0))
 		self.tf_br = tf.TransformBroadcaster()
+
 
 	def openServices(self):
 		try:
@@ -141,8 +141,8 @@ class MoveElektronModule():
 #
 #
 	def rapp_move_vel_interface(self,x,theta):
-		moveVel = rospy.ServiceProxy('moveVel', MoveVel)
-		resp1 = moveVel(x,theta)
+		moveVel = rospy.ServiceProxy('/moveVel', MoveVel)
+		resp1 = moveVel(x,0,theta)
 		return resp1.status
 
 	def rapp_take_predefined_posture_interface(self,pose):
@@ -185,7 +185,7 @@ class MoveElektronModule():
 		self.sub_obstacle = rospy.Subscriber("/obstacleDetectorState", obstacleData , self.detectObstacle)
 
 	def unsubscribeToObstacle(self):
-		self.sub_obstacle.unregister()
+		# self.sub_obstacle.unregister()
 		self.sub_obstacle = None
 
 	def isSubscribedToObstacle(self):
@@ -197,31 +197,50 @@ class MoveElektronModule():
 ##  SERVECE HANDLERS
 ####
 
+
+	def transformPose(self,target_frame,pose,time):
+		r = PoseStamped()
+		self.tl.waitForTransform(target_frame,pose.header.frame_id,time, rospy.Duration(5))
+		point_translation_upper,point_rotation_upper = self.tl.lookupTransform(target_frame,pose.header.frame_id,time)
+		transform_matrix = numpy.dot(tf.transformations.translation_matrix(point_translation_upper), tf.transformations.quaternion_matrix(point_rotation_upper))
+		xyz = tuple(numpy.dot(transform_matrix, numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 1.0])))[:3] 
+		q = tf.transformations.quaternion_from_matrix(transform_matrix)
+		print "q = ", q
+		r.header.stamp = pose.header.stamp 
+		r.header.frame_id = target_frame 
+		r.pose.position = geometry_msgs.msg.Point(*xyz) 
+		r.pose.orientation.x = q[0]
+		r.pose.orientation.y = q[1]
+		r.pose.orientation.z = q[2]
+		r.pose.orientation.w = q[3]
+		return r
 	def handle_rapp_moveTo(self,req):
 		try:
+			time = rospy.Time()
 			if(self.tl.canTransform("map", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
-
-				pose_req = geometry_msgs.PoseStamped()
+				path_req = MoveAlongPathRequest()
+				pose_req = PoseStamped()
 				pose_req.header.frame_id = "base_link"
 				pose_req.pose.position.x = req.x
 				pose_req.pose.position.y = req.y
-				pose_req.pose.position.z = req.z
+				pose_req.pose.position.z = 0
 				pose_req.pose.orientation = tf.transformations.quaternion_from_euler(0,0,req.theta)
 
-				pose_in_map = tf.transformPose("map", pose_req)
-				path = [pose_in_map]
-				self.followPath(path)
+				pose_in_map = self.transformPose("/map", pose_req,time)
+				path_req.poses = [pose_in_map]
+				resp = self.handle_rapp_MoveAlongPath(path_req)
 
 				self.unsubscribeToObstacle()
 
-				status = resp
+				status = resp.status
+				return MoveToResponse(status)
 			else:
 				status = True
-				print "[MoveTo server] - cannot transform robot frame to global frame"
-
+				print "[Move server] - cannot transform robot frame to global frame"
+				return MoveToResponse(status)
 		except Exception, ex:
-			print "[MoveTo server] - Exception %s" % str(ex)
+			print "[Move server] - Exception %s" % str(ex)
 			status = True
 		return MoveToResponse(status)	
 
