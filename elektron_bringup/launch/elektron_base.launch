@@ -1,0 +1,24 @@
+
+<launch>
+	<!-- send elektron.xml to param server -->
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find elektron_description)/robots/elektron_Laser_Tower-kinect.udrf.xacro'" />
+<!--	<node name="tf_base_footprint" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_footprint base_link 20" />
+-->
+	<!-- load base controller -->
+	<node name="elektron" pkg="elektron_base" type="elektron_base_re" respawn="true" output="screen">
+		
+		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB0" />
+		<param name="sendLoopExecuteRate" type="double" value="200" />
+		<param name="readDeviceVitalsRate" type="double" value="10" />
+		<param name="axleLength" type="double" value="0.314" />
+		<param name="encoderTicks" type="double" value="5000" />
+		<param name="wheelDiameter" type="double" value="0.1" />
+		<param name="regulatorRate" type="double" value="100" />
+		<param name="commandTimeoutTime" type="double" value="3" />
+		<param name="timeoutCommandSendTime" type="double" value="1" />
+		<param name="publishOdometryTF" type="bool" value="true" />
+
+	</node>
+	
+	 
+</launch>
