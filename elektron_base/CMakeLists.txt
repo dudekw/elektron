@@ -5,6 +5,10 @@ project(elektron_base)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  nav_msgs
+  roscpp
+  tf
   roscpp
 rospy
 )
@@ -120,6 +124,9 @@ include_directories(
 # add_library(elektron_base
 #   src/${PROJECT_NAME}/elektron_base.cpp
 # )
+ add_library(nfv2conf real_effectors/src/nfv2_config.c)
+ add_library(serialcomm real_effectors/src/serialcomm/serialcomm.cpp)
+ add_library(nfv2 real_effectors/src/nf/nfv2.c)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -127,7 +134,9 @@ include_directories(
 # add_dependencies(elektron_base ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(elektron_base_node src/elektron_base_node.cpp)
+
+
+ add_executable(elektron_base_re real_effectors/src/elektron_base_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -138,6 +147,14 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+ target_link_libraries(elektron_base_re
+   ${catkin_LIBRARIES}
+ )
+target_link_libraries(elektron_base_re
+  nfv2conf serialcomm nfv2
+ )
+
+ add_definitions("-std=gnu++11")
 #############
 ## Install ##
 #############

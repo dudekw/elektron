@@ -2,3 +2,11 @@
     path = gazebo_ros_pkgs
     url = https://github.com/ros-simulation/gazebo_ros_pkgs.git
     branch = indigo-devel
+[submodule "nf"]
+    path = elektron_base/real_effectors/src/nf
+    url = https://github.com/mwalecki/nf.git
+    branch = master
+[submodule "serialcomm"]
+    path = elektron_base/real_effectors/src/serialcomm
+    url = https://github.com/mwalecki/serialcomm.git
+    branch = master
