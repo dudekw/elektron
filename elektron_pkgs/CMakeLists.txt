@@ -5,7 +5,7 @@ project(elektron_pkgs)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  elektron_apps
+  elektron_rapps
   elektron_base
   elektron_control
   elektron_description

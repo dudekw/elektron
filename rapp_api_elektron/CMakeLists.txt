@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   eigen_conversions
   roscpp
-  elektron_pkgs
+  elektron_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -112,7 +112,7 @@ catkin_package(
   LIBRARIES ${NAVIGATION_LIB}
   LIBRARIES ${DYNAMIC_NAV_LIB}
   LIBRARIES ${DYNAMIC_VIS_LIB}
-  CATKIN_DEPENDS roscpp elektron_pkgs
+  CATKIN_DEPENDS roscpp elektron_msgs
 #  DEPENDS
 )
 
