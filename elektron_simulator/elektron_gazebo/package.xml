@@ -49,6 +49,7 @@
 <run_depend>gazebo_plugins</run_depend>
 <run_depend>gazebo_ros</run_depend>
 <run_depend>gazebo_ros_control</run_depend>
+<run_depend>map_server</run_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
