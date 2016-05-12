@@ -1,5 +1,5 @@
 #include "rapp-robots-api/navigation/navigation.hpp"
-#include "rapp/objects/poseStamped/poseStamped.hpp"
+#include "rapp/objects/pose_stamped/pose_stamped.hpp"
 #include <iostream>
 int main(int argc, char ** argv){
 
@@ -15,8 +15,8 @@ int main(int argc, char ** argv){
 
 	nav.moveJoint(joint_names, joint_angles);
 
-	rapp::object::PoseStamped pose;
-	std::vector<rapp::object::PoseStamped> poses_list;
+	rapp::object::pose_stamped pose;
+	std::vector<rapp::object::pose_stamped> poses_list;
 	poses_list.clear();
 	poses_list.push_back(pose);
 	poses_list.push_back(pose);

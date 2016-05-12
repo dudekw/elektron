@@ -76,25 +76,6 @@ NavigationImpl::~NavigationImpl() {
 //  87.49		-18.91			11.46			 1.526988	-0.330041		0.200015
 //  119.52		-25.73			18.91			 2.086017	-0.449073		0.330041
 
-	// bool NavigationImpl::moveHead(float yaw,float pitch){
-	// 	client_moveHead = n->serviceClient<elektron_msgs::MoveHead>("rapp_moveHead");
-		
-
-	// 	  elektron_msgs::MoveHead srv;
-	// 	  srv.request.pitch = pitch;
-	// 	  srv.request.yaw = yaw;
-	// 	  if (client_moveHead.call(srv))
-	// 	  {
-	// 	  	ROS_INFO("Elektron-s head position is: \n");
-	//   	  	ROS_INFO_STREAM("Yaw: "<<srv.response.yaw_now);
-	// 	  	ROS_INFO_STREAM("Pitch: "<<srv.response.pitch_now);
-	// 	  }
-	// 	  else
-	// 	  {
-	// 	    ROS_ERROR("Failed to call service moveHead"); 
-	// 	  }
-	// }
-
 	bool NavigationImpl::moveJoint(std::vector<std::string> joint, std::vector<float> angle){
 		client_moveJoint = n->serviceClient<elektron_msgs::MoveJoint>("rapp_moveJoint");
 
@@ -114,22 +95,7 @@ NavigationImpl::~NavigationImpl() {
 	 	    ROS_ERROR("Failed to call service moveJoint"); 
 	 	  }
     }		
-	// bool NavigationImpl::removeStiffness(std::string joint){
-	// 	client_removeStiffness = n->serviceClient<elektron_msgs::RemoveStiffness>("rapp_removeStiffness");
-		
 
-	// 	  elektron_msgs::RemoveStiffness srv;
-	// 	  srv.request.joint_name = joint;
-
-	// 	  if (client_removeStiffness.call(srv))
-	// 	  {
-	//   	  	ROS_INFO_STREAM(srv.request.joint_name<<" stiffness is off");
-	// 	  }
-	// 	  else
-	// 	  {
-	// 	    ROS_ERROR("Failed to call service removeStiffness"); 
-	// 	  }
-	// }	
 	bool NavigationImpl::takePredefinedPosture(std::string posture, float speed){
 		client_takePredefinedPosture = n->serviceClient<elektron_msgs::TakePredefinedPosture>("rapp_takePredefinedPosture");
 		
@@ -141,7 +107,7 @@ NavigationImpl::~NavigationImpl() {
 		  if (client_takePredefinedPosture.call(srv))
 		  {
 	  	  	return srv.response.status;
-	  	  	//ROS_INFO_STREAM(srv.request.pose<<" stiffness is off");
+
 		  }
 		  else
 		  {
@@ -164,20 +130,7 @@ NavigationImpl::~NavigationImpl() {
 		    ROS_ERROR("Failed to call service moveStop"); 
 		  }
 	}
-	// bool NavigationImpl::visOdom(){
 
-	// 	client_moveStop = n->serviceClient<elektron_msgs::MoveStop>("rapp_moveStop");
-	// 	  elektron_msgs::MoveStop srv;
-	// 	  srv.request.stop_signal = true;
-	// 	  if (client_moveStop.call(srv))
-	// 	  {
-	// 	    ROS_INFO("Elektron has been localized via QR-code");
-	// 	  }
-	// 	  else
-	// 	  {
-	// 	    ROS_ERROR("Failed to call service visOdom"); 
-	// 	  }
-	// }
 	bool NavigationImpl::lookAtPoint(float pointX,float pointY,float pointZ ){
 
 		client_lookAtPoint = n->serviceClient<elektron_msgs::LookAtPoint>("rapp_lookAtPoint");
@@ -198,7 +151,7 @@ NavigationImpl::~NavigationImpl() {
 		  }
 	}
 
-	bool NavigationImpl::moveAlongPath(std::vector<rapp::object::PoseStamped> poses){
+	bool NavigationImpl::moveAlongPath(std::vector<rapp::object::pose_stamped> poses){
 			geometry_msgs::PoseStamped pose_ros;
 			nav_msgs::Path poses_ros;
 			//poses_ros.poses;
@@ -235,12 +188,12 @@ NavigationImpl::~NavigationImpl() {
 		  }
 
 	}
-	rapp::object::PoseStamped NavigationImpl::getRobotPose(){
+	rapp::object::pose_stamped NavigationImpl::getRobotPose(){
 
 		client_getRobotPose = n->serviceClient<elektron_msgs::GetRobotPose>("rapp_getRobotPose");
 		  elektron_msgs::GetRobotPose srv;
 		  geometry_msgs::PoseStamped pose_ros;
-			rapp::object::PoseStamped pose;
+			rapp::object::pose_stamped pose;
 
 		  	pose_ros = srv.response.pose;
 
@@ -274,7 +227,7 @@ NavigationImpl::~NavigationImpl() {
 
 
 	}
-	bool NavigationImpl::setGlobalPose(rapp::object::Pose rapp_pose){
+	bool NavigationImpl::setGlobalPose(rapp::object::pose rapp_pose){
 		client_setGlobalPose = n->serviceClient<elektron_msgs::SetGlobalPose>("rapp_setGlobalPose");
 		elektron_msgs::SetGlobalPose srv;
 		ros::Time time_now = ros::Time::now();
@@ -330,13 +283,13 @@ std::vector<std::vector<float>> NavigationImpl::getTransform(std::string chainNa
 		}
 		//*/
 		ROS_INFO("[Rapp get transform] - Transformation matrix computed");
-		return transformMatrix;//tmpVec;
+		return transformMatrix;
 	}
 	else
 	{
-		//Failed to call service rapp_get_image
+
 		ROS_ERROR("[Rapp get transform] - Error calling service rapp_get_transform");
-		return transformMatrix;//tmpVec;
+		return transformMatrix;
 
 	}
 

@@ -32,10 +32,8 @@
 #include "elektron_msgs/GetTransform.h"
 //include rapp-api objects
 #include <rapp/objects/pose/pose.hpp>
-#include <rapp/objects/poseStamped/poseStamped.hpp>
- #include <rapp/objects/qrCodeMap/qrCodeMap.hpp>
- #include <rapp/objects/qrCodeMap/qrCodeMap.hpp>
- #include <rapp/objects/matrix2D/matrix2D.hpp>
+#include <rapp/objects/pose_stamped/pose_stamped.hpp>
+ #include <rapp/objects/qr_code_map/qr_code_map.hpp>
 #include "opencv2/core/core.hpp"
 
 namespace rapp {
@@ -67,9 +65,9 @@ public:
 	bool moveJoint(std::vector<std::string> joint, std::vector<float> angle);
 	bool takePredefinedPosture(std::string posture, float speed);
 	bool lookAtPoint(float x, float y, float z);
-	bool moveAlongPath(std::vector<rapp::object::PoseStamped> poses);
-	rapp::object::PoseStamped getRobotPose();
-	bool setGlobalPose(rapp::object::Pose rapp_pose);
+	bool moveAlongPath(std::vector<rapp::object::pose_stamped> poses);
+	rapp::object::pose_stamped getRobotPose();
+	bool setGlobalPose(rapp::object::pose rapp_pose);
 	
 	std::vector<std::vector<float>> getTransform(std::string chainName, int space);/*
 	Input:
