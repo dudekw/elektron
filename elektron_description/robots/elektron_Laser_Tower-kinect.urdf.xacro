@@ -40,7 +40,7 @@
 			<origin xyz="-0.0 0 0.115" rpy="0 0 0" />
 			<geometry>
 				<!--<box size="0.38 0.28 0.20" />-->
-				<mesh filename="package://elektron_description/meshes/elektron_body.dae"/>
+				<mesh filename="package://elektron_description/meshes/base/elektron_body.dae"/>
 			</geometry>
 		</visual>
 
