@@ -220,6 +220,7 @@ class MoveElektronModule():
 			if(self.tl.canTransform("map", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
 				path_req = MoveAlongPathRequest()
+				pose_zero = PoseStamped()
 				pose_req = PoseStamped()
 				pose_req.header.frame_id = "base_link"
 				pose_req.pose.position.x = req.x
@@ -228,7 +229,7 @@ class MoveElektronModule():
 				pose_req.pose.orientation = tf.transformations.quaternion_from_euler(0,0,req.theta)
 
 				pose_in_map = self.transformPose("/map", pose_req,time)
-				path_req.poses = [pose_in_map]
+				path_req.poses = [pose_zero, pose_in_map]
 				resp = self.handle_rapp_MoveAlongPath(path_req)
 
 				self.unsubscribeToObstacle()
@@ -335,18 +336,20 @@ class MoveElektronModule():
 
 	def followPath(self,path):			
 		status = "start"
-		for i in range(int(numpy.ceil(len(path)/(20)))+1):
+		for i in range((len(path)-1)):
+		# OLD		
+		#for i in range(int(numpy.ceil(len(path)/(20)))+1):
 		#int(numpy.floor(len(path.path)/200))+1):
 			print "i= ",i
 			print "liczba punktow: \n", len(path)
-			rospy.sleep(3)
+			#rospy.sleep(3)
 			robotCurrentPosition = self.getRobotCurrentPosition()
 			if (len(robotCurrentPosition) == 2):
 				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
-				if (len(path)-(i+1)*20<0.1):
+				if (len(path)-(i+1)*1<0.1):
 					point_number = len(path)-1
 				else:
-					point_number = (i+1)*20
+					point_number = (i+1)
 
 
 				nextPose = path[point_number]
@@ -382,8 +385,8 @@ class MoveElektronModule():
 				print "theta= ",theta
 				#if abs(theta) > 0.15:
 				# check if next point is not too close to current robot pose
-				#                 rotation more then 20 deg and goal distance more then 0.08 m || next pose is the goal 
-				should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.08) or (point_number == len(path)-1)
+				#                 rotation more then 20 deg and goal distance more then 0.1 m || next pose is the goal || next pose is the first pose
+				should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.1) or (point_number == len(path)-1) or  (point_number == 1)
 				if (should_move):
 					# rotate with velocity = 0.4 rad/sec 
 					thetaTime = abs(theta)/0.4
@@ -404,9 +407,9 @@ class MoveElektronModule():
 					self.rapp_stop_move_interface()
 					# move forward with velocity - 0.08 m/s
 					print "pojscie na AB"
-					move_X_time = AB/0.08
+					move_X_time = AB/0.4
 					if self.obstacle_detected == False:
-						resp = self.rapp_move_vel_interface(0.08,0)
+						resp = self.rapp_move_vel_interface(0.4,0)
 			
 						move_X_time_now = 0
 						while (move_X_time-move_X_time_now)>0:
