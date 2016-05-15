@@ -1,0 +1,25 @@
+<launch>
+  <arg name="laser"/>
+  <arg name="tower"/>
+  <arg name="tower_sensor"/>
+  <arg name="base"/> 
+
+    <!-- elektron control spawner -->
+
+ <include file="$(find elektron_control)/launch/$(arg base)_Tower_control.launch.xml" if="$(arg tower)">
+  <arg name="base" value="$(arg base)"/>
+  </include>
+ <include file="$(find elektron_control)/launch/$(arg base)_NoTower_control.launch.xml" unless="$(arg tower)">
+
+<arg name="base" value="$(arg base)"/>
+  </include>
+
+  <!-- Velocity muxer only in groovy wait for upgrade
+  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+  <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
+        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+    <param name="yaml_cfg_file" value="$(find elektron_bringup)/param/mux.yaml" />
+    <remap from="cmd_vel_mux/output" to="elektron/commands/velocity"/>
+  </node>
+ -->
+</launch>

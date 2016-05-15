@@ -1,0 +1,20 @@
+<launch>
+	<arg name="base" value="elektron"/> <!-- only elektron -->
+	<arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
+	<arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
+	<arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR kinect)"/>  <!-- kinect, rgb  --> 
+
+	<include file="$(find elektron_gazebo)/launch/includes/$(arg base).launch.xml">
+		<arg name="base" value="$(arg base)"/>
+		<arg name="laser" value="$(arg laser)"/>
+    		<arg name="tower" value="$(arg tower)"/>
+    		<arg name="tower_sensor" value="$(arg tower_sensor)"/>
+  	</include>
+
+  	<node name="control_subsystem_move_server" pkg="elektron_base" type="move_server.py" /> 
+ 	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
+  	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py"  args="1"/>
+  	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
+  	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" />
+	<include file="(find ${elektron_bringup})/launch/includes/elektron_base.launch">
+</launch>

@@ -1,0 +1,7 @@
+<launch>
+	<include file="$(find elektron_bringup)/launch/includes/elektron_description.launch" />
+	<include file="$(find elektron_bringup)/launch/includes/elektron_control.launch" />
+	<include file="$(find elektron_bringup)/launch/includes/elektron_agent.launch" />
+<!--	<include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch" />
+	<include file="$(find elektron_bringup)/launch/includes/elektron_diagnostics.launch" /> -->
+</launch>
