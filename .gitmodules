@@ -10,3 +10,7 @@
     path = elektron_base/real_effectors/src/serialcomm
     url = https://github.com/mwalecki/serialcomm.git
     branch = master
+[submodule "rapp-api-elektron"]
+    path = rapp-api-elektron
+    url =  https://github.com/dudekw/rapp-api-elektron.git
+    branch = master
