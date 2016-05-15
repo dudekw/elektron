@@ -75,9 +75,10 @@ int main(int argc, char** argv){
 	tf::Transform pitch_transform;
 
 	ros::Rate rate(10.0);
-	std::string elektron_tower_name;
-	nh.param<std::string>("elektron_tower_name", elektron_tower_name, "/dev/ttyACM0");
-	fd = open(elektron_tower_name.c_str(),O_WRONLY);
+	std::string elektron_tower_device;
+	nh.param<std::string>("elektron_tower_device", elektron_tower_device, "/dev/ttyACM0");
+	std::cout<<elektron_tower_device<<std::endl;
+	fd = open(elektron_tower_device.c_str(),O_WRONLY);
 	ros::ServiceServer service = nh.advertiseService("re_moveTowerJoint", moveTower);
 	if(fd!=-1){
 		ROS_INFO("Ready to move the tower.");
