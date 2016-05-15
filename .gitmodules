@@ -1,7 +1,3 @@
-[submodule "gazebo_ros_pkgs"]
-    path = gazebo_ros_pkgs
-    url = https://github.com/ros-simulation/gazebo_ros_pkgs.git
-    branch = indigo-devel
 [submodule "nf"]
     path = elektron_base/real_effectors/src/nf
     url = https://github.com/mwalecki/nf.git
