@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_sudo="
+SCRIPT_sudo="$(
 sudo apt-get install -y ros-indigo-desktop-full;
 sudo apt-get remove -y gazebo2;
 sudo apt-get install -y libgazebo5-dev;
@@ -14,13 +14,13 @@ sudo apt-get install -y ros-indigo-joint-limits-interface ;
 sudo apt-get install -y ros-indigo-joint-state-controller ;
 sudo apt-get install -y ros-indigo-diff-drive-controller ;
 sudo apt-get install -y ros-indigo-effort-controllers ;
-sudo apt-get install -y ros-indigo-position-controllers 
+sudo apt-get install -y ros-indigo-position-controllers) 
 "
 #sudo apt-get install ros-indigo-desktop-full
 
-SCRIPT_sudo
+echo "$(SCRIPT_sudo)"
 
-SCRIPT_rapp="
+SCRIPT_rapp=" $(
 export RAPP_BASE=~/rapp;
 rm -rf ~/rapp
 mkdir -p ~/rapp;
@@ -60,6 +60,6 @@ source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
 catkin init;
 catkin config --install;
-catkin build
+catkin build)
 "
-SCRIPT_rapp
+echo "$(SCRIPT_rapp)"
