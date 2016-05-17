@@ -68,6 +68,7 @@ FILES
 	TakePredefinedPosture.srv
 	LookAtPoint.srv
 	GetTransform.srv
+	GetImage.srv
  )
 
 ## Generate actions in the 'action' folder
