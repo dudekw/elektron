@@ -50,7 +50,7 @@ mkdir -p ~/rapp/robots/src;
 cd ~/rapp/robots/src;
 git clone https://github.com/dudekw/elektron.git;
 cd elektron;
-git submodule update --init;
+git submodule update --init -- gazebo_ros_pkgs elektron_base/real_effectors/src/nf elektron_base/real_effectors/src/serialcomm rapp-api-elektron;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
