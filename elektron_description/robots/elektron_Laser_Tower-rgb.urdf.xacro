@@ -127,7 +127,7 @@
 
 	<sensor_kinect parent="bottom_kinect_link" id="bottom"/>
 	<!-- ADD TOWER -->
-	<elektron_tower parent="base_link" camera_type="1" id="1"/> <!-- camera_type avaliable: 1 = kinect | 0 = rgb_camera -->
+	<elektron_tower parent="base_link" camera_type="0" id="1"/> <!-- camera_type avaliable: 1 = kinect | 0 = rgb_camera -->
 	<tower_PID_control_gazebo/>
 
 	<!-- SET gazebo-ROS CONTROL -->
