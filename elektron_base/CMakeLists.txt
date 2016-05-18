@@ -175,18 +175,40 @@ target_link_libraries(elektron_base_re
  )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS elektron_base elektron_base_node
+ install(TARGETS elektron_base_re
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+
+## Mark executables and/or libraries for installation
+ install(TARGETS nfv2conf
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+
+## Mark executables and/or libraries for installation
+ install(TARGETS nfv2 serialcomm
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY real_effectors/src/nf
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/nf
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
-# )
+ )
+
+## Mark cpp header files for installation
+ install(DIRECTORY real_effectors/src/serialcomm                              
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/serialcomm
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+ )
+
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
