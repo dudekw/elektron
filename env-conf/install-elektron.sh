@@ -14,9 +14,15 @@ sudo apt-get install -y ros-indigo-joint-state-controller ;
 sudo apt-get install -y ros-indigo-diff-drive-controller ;
 sudo apt-get install -y ros-indigo-effort-controllers ;
 sudo apt-get install -y ros-indigo-position-controllers;
-
-
-
+sudo apt-get install -y ros-indigo-image-transport;
+sudo apt-get install -y ros-indigo-cv-bridge;
+sudo apt-get install -y ros-indigo-eigen-conversions;
+sudo apt-get install -y ros-indigo-tf-conversions;
+sudo apt-get install -y ros-indigo-nodelet;
+sudo apt-get install -y ros-indigo-driver-base;
+sudo apt-get install -y ros-indigo-polled-camera;
+sudo apt-get install -y ros-indigo-camera-info-manager;
+sudo apt-get install -y ros-indigo-ros-core
 
 export RAPP_BASE=~/rapp;
 rm -rf ~/rapp;
