@@ -10,9 +10,8 @@
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
   	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" />
 
-	<include file="(find ${elektron_bringup})/launch/includes/elektron_base.launch">
-	
-</include>
+
+	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch"/>
 <include file="(find ${netusb_camera_driver})/launch/generic.launch">
 <!-- Namespace to publish in -->
   <arg name="camera" value="head_camera_rgb" />
@@ -24,7 +23,7 @@
        For help configuring your camera or determining its IP address, see
        http://www.ros.org/wiki/prosilica_camera/Tutorials.
        
-       By default, when neither argument is set, open the first camera found.
+       By default, when neither argument is set, open the fisourcerst camera found.
        If both are set, open by IP address and verify the GUID matches.
   -->
   <arg name="camera_id" default="0" />
