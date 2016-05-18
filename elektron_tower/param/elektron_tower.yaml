@@ -1,1 +1,1 @@
-elektron_tower_device: '/dev/ttyACM0'
+elektron_tower_device: '/dev/ttyUSB1'
