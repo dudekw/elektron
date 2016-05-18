@@ -8,11 +8,12 @@ TO DO
 
 <arg name="elektron_world_file"  default="$(find elektron_gazebo)/worlds/p109_world.world"/>
 
+
   <arg name="gui" default="true"/>
 <arg name="base" value="elektron"/> <!-- only elektron -->
   <arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
   <arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
-  <arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR kinect)"/>  <!-- kinect, rgb  --> 
+  <arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR rgb)"/>  <!-- kinect, rgb  --> 
 <!-- <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>  --> 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">

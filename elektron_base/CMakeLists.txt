@@ -6,6 +6,7 @@ project(elektron_base)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  sensor_msgs
   nav_msgs
   roscpp
   tf
@@ -169,6 +170,7 @@ target_link_libraries(elektron_base_re
    control_subsystem/scripts/estimator_server.py
    virtual_effectors/scripts/tower_controller.py
    virtual_effectors/scripts/base_controller.py
+   virtual_receptors/scripts/cameras_controller.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
