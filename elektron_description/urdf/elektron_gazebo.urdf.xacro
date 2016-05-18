@@ -19,7 +19,7 @@
           </clip>
         </camera>
         <plugin name="kinect_camera_controller_${id}" filename="libgazebo_ros_openni_kinect.so">
-          <cameraName>kinect_${id}</cameraName>
+          <cameraName>${id}_kinect</cameraName>
           <alwaysOn>true</alwaysOn>
           <updateRate>10</updateRate>
           <imageTopicName>rgb/image_raw</imageTopicName>
@@ -68,9 +68,9 @@
       <plugin name="camera_controller_${id}" filename="libgazebo_ros_camera.so">
         <alwaysOn>true</alwaysOn>
         <updateRate>0.0</updateRate>
-        <cameraName>elektron/camera_${id}</cameraName>
-        <imageTopicName>/image_raw</imageTopicName>
-        <cameraInfoTopicName>/camera_info</cameraInfoTopicName>
+        <cameraName>${id}_camera_rgb</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <frameName>${frame}</frameName>
         <hackBaseline>0.07</hackBaseline>
         <distortionK1>0.0</distortionK1>

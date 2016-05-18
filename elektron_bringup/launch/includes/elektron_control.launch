@@ -10,7 +10,6 @@
   <arg name="base" value="$(arg base)"/>
   </include>
  <include file="$(find elektron_control)/launch/$(arg base)_NoTower_control.launch.xml" unless="$(arg tower)">
-
 <arg name="base" value="$(arg base)"/>
   </include>
 

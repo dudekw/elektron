@@ -102,14 +102,14 @@ def signal_handler(signal, frame):
 	print "[Cameras VR] - system exits"
 	sys.exit(0)
 
-def main(topic_name):
+def main(node_name,topic_name):
 	""" Main entry point
 		"""
 	try:
 		signal.signal(signal.SIGINT, signal_handler)
 		print "[Cameras VR] - Press Ctrl + C to exit system correctly"
 		#self.use_sim = use_sim
-		rospy.init_node('acore_cameras_receptor')
+		rospy.init_node("acore_cameras_receptor_"+node_name)
 		global ElektronCameras
 		ElektronCameras = CamerasModule("ElektronCameras",topic_name)
 		rospy.spin()
@@ -127,9 +127,9 @@ def main(topic_name):
 		
 if __name__ == "__main__":
 	try:
-		if len(sys.argv) < 2:
-			print("usage: cameras_controller <<camera_topic_name>>")
+		if len(sys.argv) < 3:
+			print("usage: cameras_controller <<node_name>> <<camera_topic_name>>")
 		else:
-			main(sys.argv[1])
+			main(sys.argv[1],sys.argv[2])
 	except Exception,e:
 		print "__name__ - Error %s" % str(e)

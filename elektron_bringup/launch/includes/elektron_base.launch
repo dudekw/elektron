@@ -1,7 +1,7 @@
 
 <launch>
 	<!-- send elektron.xml to param server -->
-	<param name="robot_description" command="$(find xacro)/xacro.py '$(find elektron_description)/robots/elektron_Laser_Tower-kinect.udrf.xacro'" />
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find elektron_description)/robots/elektron_Laser_Tower-kinect.urdf.xacro'" />
 <!--	<node name="tf_base_footprint" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_footprint base_link 20" />
 -->
 	<!-- load base controller -->
