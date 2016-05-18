@@ -1,9 +1,6 @@
 
 <launch>
-	<!-- send elektron.xml to param server -->
-	<param name="robot_description" command="$(find xacro)/xacro.py '$(find elektron_description)/robots/elektron_Laser_Tower-rgb.urdf.xacro'" />
-<!--	<node name="tf_base_footprint" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_footprint base_link 20" />
--->
+
 	<!-- load base controller -->
 	<node name="elektron" pkg="elektron_base" type="elektron_base_re" respawn="true" output="screen">
 		
@@ -17,7 +14,7 @@
 		<param name="commandTimeoutTime" type="double" value="3" />
 		<param name="timeoutCommandSendTime" type="double" value="1" />
 		<param name="publishOdometryTF" type="bool" value="true" />
-
+		<remap from="cmd_vel" to="/elektron/mobile_base_controller/cmd_vel"/>
 	</node>
 	
 	 
