@@ -12,7 +12,7 @@
 
 	<include file="(find ${elektron_bringup})/launch/includes/elektron_base.launch">
 	
-</launch>
+</include>
 <include file="(find ${netusb_camera_driver})/launch/generic.launch">
 <!-- Namespace to publish in -->
   <arg name="camera" value="head_camera_rgb" />
