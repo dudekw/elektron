@@ -22,8 +22,9 @@ sudo apt-get install -y ros-indigo-nodelet;
 sudo apt-get install -y ros-indigo-driver-base;
 sudo apt-get install -y ros-indigo-polled-camera;
 sudo apt-get install -y ros-indigo-camera-info-manager;
-sudo apt-get install -y ros-indigo-ros-core
-
+sudo apt-get install -y ros-indigo-ros-core;
+sudo apt-get install -y ros-indigo-xacro;
+sudo apt-get install -y ros-indigo-robot-state-publisher
 export RAPP_BASE=~/rapp;
 rm -rf ~/rapp;
 mkdir -p ~/rapp;
