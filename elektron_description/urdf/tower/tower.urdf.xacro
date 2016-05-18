@@ -6,6 +6,21 @@
 
   <xacro:macro name="elektron_tower" params="parent camera_type id">
 
+  <joint name="high_kinect_base_joint_${id}" type="fixed">
+      <origin xyz="${high_kinect_base_px} ${high_kinect_base_py} ${high_kinect_base_pz}" rpy="${high_kinect_base_or} ${high_kinect_base_op} ${high_kinect_base_oy}"/>
+      <parent link="${parent}"/>
+      <child link="high_kinect_base_${id}" />
+    </joint>
+    <link name="high_kinect_base_${id}">
+    	    	 <inertial>
+		     <origin xyz="0 0 0" rpy="0 0 0"/>
+		     <mass value="0.1"/>
+		     <inertia ixx="1"  ixy="0"  ixz="0" iyy="1" iyz="0" izz="1" />
+   		</inertial>
+	</link>
+
+<sensor_kinect parent="high_kinect_base_${id}" id="tower_top"/>
+
 
    <joint name="head_base_joint_${id}" type="fixed">
       <origin xyz="${head_base_px} ${head_base_py} ${head_base_pz}" rpy="${head_base_or} ${head_base_op} ${head_base_oy}"/>
