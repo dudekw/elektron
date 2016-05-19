@@ -7,6 +7,9 @@
 	</include>
 
 	<include file="$(find elektron_bringup)/launch/includes/elektron_agent.launch" />
+	<include file="$(find elektron_bringup)/launch/includes/elektron_sensors.launch" />
+
+
 
 <!--	<include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch" />
 	<include file="$(find elektron_bringup)/launch/includes/elektron_diagnostics.launch" /> -->

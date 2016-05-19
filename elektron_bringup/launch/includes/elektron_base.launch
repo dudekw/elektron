@@ -4,7 +4,7 @@
 	<!-- load base controller -->
 	<node name="elektron" pkg="elektron_base" type="elektron_base_re" respawn="true" output="screen">
 		
-		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB0" />
+		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB1" />
 		<param name="sendLoopExecuteRate" type="double" value="200" />
 		<param name="readDeviceVitalsRate" type="double" value="10" />
 		<param name="axleLength" type="double" value="0.314" />

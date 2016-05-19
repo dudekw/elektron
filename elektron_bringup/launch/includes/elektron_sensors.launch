@@ -3,7 +3,7 @@
 
 	<node name="tf_laser_link" pkg="tf" type="static_transform_publisher" args="0.11 0 0.22 0 0 0 base_link base_laser_link 20" />
 
-	<node name="base_laser" pkg="LMS1xx" type="LMS100" respawn="true" output="screen">
+	<node name="base_laser" pkg="lms1xx" type="LMS1xx_node" respawn="true" output="screen">
 <!--		<remap from="scan" to="scan_raw"/>-->
 		<param name="host" type="string" value="192.168.1.2" />
 		<param name="frame_id" type="string" value="/base_laser_link" />
@@ -11,9 +11,7 @@
 
 
 	<arg name="camera" value="head_camera_rgb" />
-
-	<!-- Kinect bottom node -->
-	<include file="$(find openni)/launch/generic.launch" if="$(arg netusb)">
+	<arg name="netusb" default="1" />
 
 	<!-- NETUSB camera node -->
 
