@@ -17,7 +17,7 @@
 		<param name="commandTimeoutTime" type="double" value="3" />
 		<param name="timeoutCommandSendTime" type="double" value="1" />
 		<param name="publishOdometryTF" type="bool" value="true" />
-
+		<remap from="cmd_vel" to="/elektron/mobile_base_controller/cmd_vel"/>
 	</node>
 	
 	 
