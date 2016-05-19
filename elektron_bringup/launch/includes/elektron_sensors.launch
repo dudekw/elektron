@@ -1,7 +1,7 @@
 <launch>
-	<!-- Sick LMS100 laser rangefinder -->
+	<!-- Sick LMS100 laser rangefinder
 
-	<node name="tf_laser_link" pkg="tf" type="static_transform_publisher" args="0.11 0 0.22 0 0 0 base_link base_laser_link 20" />
+	<node name="tf_laser_link" pkg="tf" type="static_transform_publisher" args="0.11 0 0.22 0 0 0 base_link base_laser_link 20" /> -->
 
 	<node name="base_laser" pkg="lms1xx" type="LMS1xx_node" respawn="true" output="screen">
 <!--		<remap from="scan" to="scan_raw"/>-->
@@ -9,12 +9,28 @@
 		<param name="frame_id" type="string" value="/base_laser_link" />
 	</node>
 
+	<!-- KINECT camera nodes -->
+	<arg name="tower" default="1" />
+	<!-- Tower TOP -->
+	<node name="kinect_tower_top" pkg="$(find openni_camera)" type="openni_node" 
+	ns="tower_top_kinect" if="$(arg tower)" >
 
-	<arg name="camera" value="head_camera_rgb" />
-	<arg name="netusb" default="1" />
+	<param name="device_id" value="" />
+	<param name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_top" />
+	<param name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top" />
+	</node>
+	<!-- Tower bottom -->
+	<node name="kinect_tower_bottom" pkg="$(find openni_camera)" type="openni_node" 
+	ns="bottom_kinect" if="$(arg tower)" >
+
+	<param name="device_id" value="" />
+	<param name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_bottom" />
+	<param name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top_bottom" />
+	</node>
 
 	<!-- NETUSB camera node -->
-
+	<arg name="camera" value="head_camera_rgb" />
+	<arg name="netusb" default="1" />
 	<include file="$(find netusb_camera_driver)/launch/generic.launch" if="$(arg netusb)">
 		<!-- Namespace to publish in -->
 	 	 <arg name="camera" value="head_camera_rgb" />
@@ -35,7 +51,7 @@
 		<arg name="trigger_mode" default="streaming" />
 
 		<!-- tf frame id associated with this camera -->
-		<arg name="frame_id" default="$(arg camera)_optical_frame" />
+		<arg name="frame_id" default="rgb_head_1" />
 	</include>
 
 

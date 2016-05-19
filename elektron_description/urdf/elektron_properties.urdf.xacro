@@ -36,7 +36,7 @@
 	<property name="head_base_op" value="0" />
 	<property name="head_base_oy" value="0" />
 
-	<property name="high_kinect_base_px" value="-0.05" />
+	<property name="high_kinect_base_px" value="-0.15" />
 	<property name="high_kinect_base_py" value="0" /> 
 	<property name="high_kinect_base_pz" value="1.15" />
 	<property name="high_kinect_base_or" value="0" /> 

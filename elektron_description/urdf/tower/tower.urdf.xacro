@@ -147,7 +147,7 @@
 		<elektron_rgb_camera parent="head_end_link_${id}" id="head"/>
 
     <joint name="camera_rgb_${id}" type="fixed">
-      <origin xyz="0.0 0.0 0.0" rpy="0 -${M_PI/2} ${M_PI/2}"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
       <parent link="camera_optical_link_head"/>
       <child link="rgb_head_${id}"/>
     </joint>  
