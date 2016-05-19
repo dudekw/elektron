@@ -50,7 +50,7 @@ bool sendAngles( int yaw, int pitch){
 		const char* message_char;
 		std::string message_str = toString(pitch)+" "+toString(yaw)+"\n";
 		message_char = message_str.c_str();
-		//std::cout<<message_char<<std::endl;
+		std::cout<<message_char<<std::endl;
 	if(fd!=-1){
 		write(fd,message_char,strlen(message_char));
 
@@ -82,14 +82,14 @@ bool moveTower(elektron_msgs::MoveTower::Request  &req,
 		orientation_pitch = req.pitch;
 	}
 	if (req.moveJoints.at(0)=="yaw"){
-		res.status = sendAngles((int) (req.yaw*180/3.14+90), (int) ((req.pitch+0.73)*180/3.14));
+		res.status = sendAngles((int) (req.yaw*180/3.14+90), (int) ((orientation_pitch+0.73)*180/3.14));
 		orientation_yaw = req.yaw;
 	}
 	if (req.moveJoints.at(0)=="pitch"){
-		res.status = sendAngles((int) (req.yaw*180/3.14+90), (int) ((req.pitch+0.73)*180/3.14));
+		res.status = sendAngles((int) (orientation_yaw*180/3.14+90), (int) ((req.pitch+0.73)*180/3.14));
 		orientation_pitch = req.pitch;
 	}
-	return false;
+	res.status=true;
 }
 
 int main(int argc, char** argv){
