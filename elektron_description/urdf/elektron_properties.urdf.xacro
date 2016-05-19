@@ -22,23 +22,23 @@
      Note: REP needs to be updated with the information below 
      (currently in development and awaiting feedback)
    -->
-	<property name="kinect_px" value="0.1" />
+	<property name="kinect_px" value="-0" />
 	<property name="kinect_py" value="0.0" />  <!-- Y varies for different configurations. get sets in sensors_urdf -->
 	<property name="kinect_pz" value="0.45"/>
 	<property name="kinect_or" value="0" />
 	<property name="kinect_op" value="0" />
 	<property name="kinect_oy" value="0" />
 
-	<property name="head_base_px" value="0.1" />
+	<property name="head_base_px" value="0" />
 	<property name="head_base_py" value="0.0" /> 
 	<property name="head_base_pz" value="0.75"/>
 	<property name="head_base_or" value="0" />
 	<property name="head_base_op" value="0" />
 	<property name="head_base_oy" value="0" />
 
-	<property name="high_kinect_base_px" value="0" />
+	<property name="high_kinect_base_px" value="-0.05" />
 	<property name="high_kinect_base_py" value="0" /> 
-	<property name="high_kinect_base_pz" value="1.2" />
+	<property name="high_kinect_base_pz" value="1.15" />
 	<property name="high_kinect_base_or" value="0" /> 
 	<property name="high_kinect_base_op" value="0" /> 
 	<property name="high_kinect_base_oy" value="0" />
