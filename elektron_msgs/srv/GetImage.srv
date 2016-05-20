@@ -1,2 +1,4 @@
+uint32 camera_id
+uint32 resolution
 ---
 sensor_msgs/Image frame
