@@ -64,15 +64,15 @@ class CamerasModule():
 
 			if (enable_head=="1"):
 				topic_name_head = "/head_camera_rgb/image_raw"
-				rospy.wait_for_message(topic_name_head,Image,timeout=4)
+				rospy.wait_for_message(topic_name_head,Image,timeout=10)
 				image_sub_head = rospy.Subscriber(topic_name_head, Image, self.writeImage_head)
 			if (enable_top_kinect=="1"):
 				topic_name_top_kinect = "/tower_top_kinect/rgb/image_raw"
-				rospy.wait_for_message(topic_name_top_kinect,Image,timeout=4)
+				rospy.wait_for_message(topic_name_top_kinect,Image,timeout=10)
 				image_sub_top_kinect = rospy.Subscriber(topic_name_top_kinect, Image, self.writeImage_top_kinect)
 			if (enable_bottom_kinect=="1"):
 				topic_name_bottom_kinect = "/bottom_kinect/rgb/image_raw"
-				rospy.wait_for_message(topic_name_bottom_kinect,Image,timeout=4)
+				rospy.wait_for_message(topic_name_bottom_kinect,Image,timeout=10)
 				image_sub_bottom_kinect = rospy.Subscriber(topic_name_bottom_kinect, Image, self.writeImage_bottom_kinect)
 		except(rospy.ROSException), e:
 			print "Camete image topic not available, aborting..."
