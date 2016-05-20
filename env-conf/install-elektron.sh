@@ -32,6 +32,7 @@ mkdir -p ~/rapp/rapp-api/src ;
 cd ~/rapp/rapp-api/src;
 git clone -b wut https://github.com/rapp-project/rapp-api.git;
 git clone -b cpp https://github.com/rapp-project/rapp-robots-api.git;
+git clone https://github.com/maciek-slon/rapp-cloud-api.git;
 
 source /opt/ros/indigo/setup.bash;
 cd ~/rapp/rapp-api;
