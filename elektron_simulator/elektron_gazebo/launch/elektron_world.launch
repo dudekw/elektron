@@ -36,5 +36,7 @@ TO DO
   <node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py"  args="1"/>
   <node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
   <node name="real_effector_tower_gazebo" pkg="elektron_gazebo" type="tower_real_effector.py" />
+  <node name="virtual_receptor_cameras" pkg="elektron_base" type="cameras_controller.py"  args="_1 1 1 1"/>
+
  <!-- <node name="map_server_gazebo" pkg="map_server" type="map_server" args="$(find elektron_navigation)/maps/523_obstacle2.yaml"/> -->
 </launch>
