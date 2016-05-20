@@ -12,6 +12,7 @@ import signal
 from sensor_msgs.msg import Imu
 from elektron_msgs.srv import GetRobotPose,GetRobotPoseResponse
 from elektron_msgs.srv import SetGlobalPose, SetGlobalPoseResponse 
+from elektron_msgs.srv import GetTransform,GetTransformResponse
 
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, PoseStamped
 import numpy as np
@@ -71,6 +72,38 @@ class ElektronEstimator():
 			print "[Estimator server] - Exception %s" % str(ex)
 			status = True
 		return GetRobotPoseResponse(actual_pose)
+
+	def handle_getTransform(self,req):
+		actual_pose = PoseStamped()
+		if req.space == 0:
+			space = "base_link"
+		elif req.space == 1:
+			space = "map"
+		else:
+			status = True
+			return GetTransformResponse(actual_pose)		
+		try:
+			if self.tl.canTransform(space,req.chainName,rospy.Time()):
+				ekf_pose = self.tl.lookupTransform(space,req.chainName,rospy.Time())
+				actual_pose.pose.position.x = ekf_pose[0][0]
+				actual_pose.pose.position.y = ekf_pose[0][1]
+				actual_pose.pose.position.z = ekf_pose[0][2]
+				actual_pose.pose.orientation.x = ekf_pose[1][0]
+				actual_pose.pose.orientation.y = ekf_pose[1][1]
+				actual_pose.pose.orientation.z = ekf_pose[1][2]
+				actual_pose.pose.orientation.w = ekf_pose[1][3]
+
+				actual_pose.header.seq = 1
+				actual_pose.header.stamp= rospy.Time.now()
+				actual_pose.header.frame_id = space
+			else:
+				status = True
+			status = False
+		except Exception, ex:
+			print "[Estimator server] - Exception %s" % str(ex)
+			status = True
+		return GetTransformResponse(actual_pose)
+
 	def handle_setGlobalPose(self,req):
 		try:
 			self.SubCall(req)
@@ -124,7 +157,12 @@ class ElektronEstimator():
 			self.service_get = rospy.Service('rapp_getRobotPose', GetRobotPose, self.handle_getRobotPose)
 		except Exception, ex:
 			print "[Estimator server] - Exception %s" % str(ex)
+		try:
+			print "[Estimator server] - service - [rapp_getTransforme]"
 
+			self.service_getTr = rospy.Service('rapp_getTransform', GetTransform, self.handle_getTransform)
+		except Exception, ex:
+			print "[Estimator server] - Exception %s" % str(ex)
 	def publishOdom(self):
 
 		self.tf_br.sendTransform(self.odom_transformation.position, self.odom_transformation.orientation,
