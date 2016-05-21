@@ -11,22 +11,23 @@
 
 	<!-- KINECT camera nodes -->
 	<arg name="tower" default="1" />
+
 	<!-- Tower TOP -->
-	<node name="kinect_tower_top" pkg="$(find openni_camera)" type="openni_node" 
-	ns="tower_top_kinect" if="$(arg tower)" >
+	<include file="$(find openni_launch)/launch/openni.launch" if="$(arg tower)" >
+	<arg name="camera" value="tower_top_kinect" />
+	<arg name="device_id" value="A00365A12014111A" />
 
-	<param name="device_id" value="" />
-	<param name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_top" />
-	<param name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top" />
-	</node>
-	<!-- Tower bottom -->
-	<node name="kinect_tower_bottom" pkg="$(find openni_camera)" type="openni_node" 
-	ns="bottom_kinect" if="$(arg tower)" >
+	<!--<arg name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_top" />
+	<arg name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top" />-->
+	</include>
 
-	<param name="device_id" value="" />
-	<param name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_bottom" />
-	<param name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top_bottom" />
-	</node>
+	<!-- Tower bottom 
+	<include file="$(find openni_launch)/launch/openni.launch" if="$(arg tower)" >
+	<arg name="camera" value="bottom_kinect" />
+	<arg name="device_id" value="B00366710452116B" />
+	<arg name="depth_frame_id " value="kinect_camera_depth_optical_frame_tower_bottom" />
+	<arg name="rgb_frame_id" value="kinect_camera_rgb_optical_frame_tower_top_bottom" />
+	</include> -->
 
 	<!-- NETUSB camera node -->
 	<arg name="camera" value="head_camera_rgb" />

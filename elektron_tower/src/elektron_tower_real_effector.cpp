@@ -126,16 +126,16 @@ bool moveTower(elektron_msgs::MoveTower::Request  &req,
          elektron_msgs::MoveTower::Response &res)
 {
 	if (req.moveJoints.size()==2){
-		res.status = sendAngles((-1)*(int) (req.yaw*180/3.14+90), (-1)*(int) ((req.pitch+0.73)*180/3.14));
+		res.status = sendAngles((int) ((-1)*req.yaw*180/3.14+90), (int) (((-1)*req.pitch+0.73)*180/3.14));
 		orientation_yaw = req.yaw;
 		orientation_pitch = req.pitch;
 	}
 	if (req.moveJoints.at(0)=="yaw"){
-		res.status = sendAngles((-1)*(int) (req.yaw*180/3.14+90), (-1)*(int) ((orientation_pitch+0.73)*180/3.14));
+		res.status = sendAngles((int) ((-1)*req.yaw*180/3.14+90), (int) (((-1)*orientation_pitch+0.73)*180/3.14));
 		orientation_yaw = req.yaw;
 	}
 	if (req.moveJoints.at(0)=="pitch"){
-		res.status = sendAngles((-1)*(int) (orientation_yaw*180/3.14+90), (-1)*(int) ((req.pitch+0.73)*180/3.14));
+		res.status = sendAngles((int) ((-1)*orientation_yaw*180/3.14+90), (int) (((-1)*req.pitch+0.73)*180/3.14));
 		orientation_pitch = req.pitch;
 	}
 	res.status=true;

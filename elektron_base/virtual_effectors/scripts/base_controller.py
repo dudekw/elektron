@@ -63,7 +63,7 @@ class BaseEffectorModule():
 		print "[Base effector] - Setting variables"
 		self.moveJoint = rospy.ServiceProxy('moveVel', MoveTower)
 		if (use_sim == "0"):
-			topic = "/cmd_vel"
+			topic = "/elektron/mobile_base_controller/cmd_vel"
 		elif (use_sim == "1"):
 			topic = "/elektron/mobile_base_controller/cmd_vel"	
 		else:
@@ -102,8 +102,8 @@ class BaseEffectorModule():
 
 	def rapp_set_vel_interface(self,req):
 		
-		self.set_vel.linear.x = req.velocity_x
-		self.set_vel.angular.z = req.velocity_theta
+		self.set_vel.linear.x = req.velocity_x*4
+		self.set_vel.angular.z = req.velocity_theta*12
 		status = False
 		return MoveVelResponse(status)
 	def rapp_stop_vel_interface(self,req):
