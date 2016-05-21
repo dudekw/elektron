@@ -210,7 +210,7 @@ class MoveElektronModule():
 		r.header.frame_id = target_frame 
 		r.pose.position.x = point_translation_upper[0]
 		r.pose.position.y = point_translation_upper[1]
-		r.pose.positio.z = point_translation_upper[2]
+		r.pose.position.z = point_translation_upper[2]
 		r.pose.orientation.x = q[0]
 		r.pose.orientation.y = q[1]
 		r.pose.orientation.z = q[2]
