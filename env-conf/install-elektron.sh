@@ -28,43 +28,101 @@ sudo apt-get install -y ros-indigo-camera-info-manager;
 sudo apt-get install -y ros-indigo-ros-core;
 sudo apt-get install -y ros-indigo-xacro;
 sudo apt-get install -y ros-indigo-robot-state-publisher
-export RAPP_BASE=~/rapp;
-rm -rf ~/rapp;
 mkdir -p ~/rapp;
 mkdir -p ~/rapp/rapp-api/src ;
 cd ~/rapp/rapp-api/src;
-git clone -b wut https://github.com/rapp-project/rapp-api.git;
-git clone -b cpp https://github.com/rapp-project/rapp-robots-api.git;
-git clone https://github.com/maciek-slon/rapp-cloud-api.git;
+
+if [ -d "rapp-api" ]; then
+	cd ~/rapp/rapp-api/src/rapp-api;
+	git pull;
+else
+	git clone -b wut https://github.com/rapp-project/rapp-api.git;
+fi
+
+cd ~/rapp/rapp-api/src;
+
+if [ -d "rapp-robots-api" ]; then
+	cd ~/rapp/rapp-api/src/rapp-robots-api;
+	git pull;
+else
+	git clone -b cpp https://github.com/rapp-project/rapp-robots-api.git;
+fi
+
+cd ~/rapp/rapp-api/src;
+
+if [ -d "rapp-cloud-api" ]; then
+	cd ~/rapp/rapp-api/src/rapp-cloud-api;
+	git pull;
+else
+	git clone https://github.com/maciek-slon/rapp-cloud-api.git;
+fi
 
 source /opt/ros/indigo/setup.bash;
 cd ~/rapp/rapp-api;
-catkin init;
-catkin config --cmake-args -DBUILD_ALL=ON;
-catkin config --install;
-catkin build;
 
-export RAPP_BASE=$HOME/rapp;
-mkdir -p ~/rapp ;
+if [ -d "install" ]; then
+	catkin clean -y;
+	catkin init;
+	catkin config --cmake-args -DBUILD_ALL=ON;
+	catkin config --install;
+	catkin build;
+else
+	catkin init;
+	catkin config --cmake-args -DBUILD_ALL=ON;
+	catkin config --install;
+	catkin build;
+fi
+
 
 mkdir -p ~/rapp/rapp-apps/src;
 cd ~/rapp/rapp-apps/src;
-git clone https://github.com/maciek-slon/rapp_sample.git rapp-samples;
+if [ -d "rapp-samples" ]; then
+	cd ~/rapp/rapp-api/src/rapp-samples;
+	git pull;
+else
+	git clone https://github.com/maciek-slon/rapp_sample.git rapp-samples;
+fi
+
 source ~/rapp/rapp-api/install/setup.bash;
+
 cd ~/rapp/rapp-apps;
-catkin init;
-catkin config --install;
-catkin config --isolate-install;
-catkin build;
+
+if [ -d "install" ]; then
+	catkin clean -y;
+	catkin init;
+	catkin config --install;
+	catkin config --isolate-install;
+	catkin build;
+else
+	catkin init;
+	catkin config --install;
+	catkin config --isolate-install;
+	catkin build;
+fi
 
 mkdir -p ~/rapp/robots/src;
 cd ~/rapp/robots/src;
-git clone https://github.com/dudekw/elektron.git;
-cd elektron;
+if [ -d "elektron" ]; then
+	cd ~/rapp/robots/src/elektron;
+	git pull;
+else
+	git clone https://github.com/dudekw/elektron.git;
+fi
+
+cd ~/rapp/robots/src/elektron;
 git submodule update --init -- gazebo_ros_pkgs elektron_base/real_effectors/src/nf elektron_base/real_effectors/src/serialcomm rapp-api-elektron;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
-catkin init;
-catkin config --install;
-catkin build
+
+if [ -d "install" ]; then
+	catkin clean -y;
+	catkin init;
+	catkin config --install;
+	catkin build
+else
+	catkin init;
+	catkin config --install;
+	catkin build
+fi
+

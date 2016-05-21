@@ -34,7 +34,7 @@ source /opt/ros/indigo/setup.bash;
 cd ~/rapp/rapp-api;
 
 if [ -d "install" ]; then
-	catkin clean;
+	catkin clean -y;
 	catkin init;
 	catkin config --cmake-args -DBUILD_ALL=ON;
 	catkin config --install;
@@ -61,7 +61,7 @@ source ~/rapp/rapp-api/install/setup.bash;
 cd ~/rapp/rapp-apps;
 
 if [ -d "install" ]; then
-	catkin clean;
+	catkin clean -y;
 	catkin init;
 	catkin config --install;
 	catkin config --isolate-install;
@@ -89,7 +89,7 @@ source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
 
 if [ -d "install" ]; then
-	catkin clean;
+	catkin clean -y;
 	catkin init;
 	catkin config --install;
 	catkin build
