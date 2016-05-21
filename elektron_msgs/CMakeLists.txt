@@ -69,6 +69,13 @@ FILES
 	LookAtPoint.srv
 	GetTransform.srv
 	GetImage.srv
+	Say.srv
+	Record.srv
+	MicrophoneEnergy.srv
+	PlayAudio.srv
+RecognizeWord.srv
+RecordWithSoundDetection.srv
+VoiceRecord.srv
  )
 
 ## Generate actions in the 'action' folder
