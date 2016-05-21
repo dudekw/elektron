@@ -435,30 +435,30 @@ class MoveElektronModule():
 			print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 			return status
 		# if at goal position, rotate to the goal orientation
-		else:
-			print "nawrotka na kierunek koncowy"
-			robotCurrentPosition = self.getRobotCurrentPosition()
-			robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
-			print "last point orientation: \n", nextPoseOrientationZ
-			theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
-			if abs(theta2) > 3.14:
-				print"\n theta > 3.14\n"
-				theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
-
-			# rotate with velocity = 0.4 rad/sec 
-			theta2_Time = abs(theta2)/0.4
-			
-			resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
 		
-			thetaTime_now = 0
-			while (theta2_Time-thetaTime_now)>0:
-				if self.obstacle_detected == True:
-					status = "obstacle"
-					break	
-				rospy.sleep(0.1)
+		print "nawrotka na kierunek koncowy"
+		robotCurrentPosition = self.getRobotCurrentPosition()
+		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
+		print "last point orientation: \n", nextPoseOrientationZ
+		theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
+		if abs(theta2) > 3.14:
+			print"\n theta > 3.14\n"
+			theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
+
+		# rotate with velocity = 0.4 rad/sec 
+		theta2_Time = abs(theta2)/0.4
+			
+		resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
+		
+		thetaTime_now = 0
+		while (theta2_Time-thetaTime_now)>0:
+			if self.obstacle_detected == True:
+				status = "obstacle"
+				break	
+			rospy.sleep(0.1)
 				
-				thetaTime_now = thetaTime_now + 0.1
-			self.rapp_stop_move_interface()
+			thetaTime_now = thetaTime_now + 0.1
+		self.rapp_stop_move_interface()
 
 		if status == "obstacle":
 			return status
