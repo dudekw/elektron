@@ -204,19 +204,24 @@ class MoveElektronModule():
 		point_translation_upper,point_rotation_upper = self.tl.lookupTransform(target_frame,pose.header.frame_id,time)
 		transform_matrix = numpy.dot(tf.transformations.translation_matrix(point_translation_upper), tf.transformations.quaternion_matrix(point_rotation_upper))
 		xyz = tuple(numpy.dot(transform_matrix, numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 1.0])))[:3] 
-		q = tf.transformations.quaternion_from_matrix(transform_matrix)
+		q = tf.transformations.quaternion_from_euler(point_rotation_upper[0],point_rotation_upper[1],point_rotation_upper[2])
 		print "q = ", q
 		r.header.stamp = pose.header.stamp 
 		r.header.frame_id = target_frame 
-		r.pose.position = geometry_msgs.msg.Point(*xyz) 
+		r.pose.position.x = point_translation_upper[0]
+		r.pose.position.y = point_translation_upper[1]
+		r.pose.positio.z = point_translation_upper[2]
 		r.pose.orientation.x = q[0]
 		r.pose.orientation.y = q[1]
 		r.pose.orientation.z = q[2]
 		r.pose.orientation.w = q[3]
+		print "from pose = ",r.pose.orientation
 		return r
 	def handle_rapp_moveTo(self,req):
 		try:
 			time = rospy.Time()
+			
+
 			if(self.tl.canTransform("map", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
 				path_req = MoveAlongPathRequest()
@@ -227,7 +232,7 @@ class MoveElektronModule():
 				pose_req.pose.position.y = req.y
 				pose_req.pose.position.z = 0
 				pose_req.pose.orientation = tf.transformations.quaternion_from_euler(0,0,req.theta)
-
+				print "requested = ",req.theta
 				pose_in_map = self.transformPose("/map", pose_req,time)
 				path_req.poses = [pose_zero, pose_in_map]
 				resp = self.handle_rapp_MoveAlongPath(path_req)
@@ -336,6 +341,7 @@ class MoveElektronModule():
 
 	def followPath(self,path):			
 		status = "start"
+		print path
 		for i in range((len(path)-1)):
 		# OLD		
 		#for i in range(int(numpy.ceil(len(path)/(20)))+1):
@@ -437,6 +443,9 @@ class MoveElektronModule():
 		# if at goal position, rotate to the goal orientation
 		
 		print "nawrotka na kierunek koncowy"
+		nextPose = path[len(path)-1]
+		nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
+		print nextPose
 		robotCurrentPosition = self.getRobotCurrentPosition()
 		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
 		print "last point orientation: \n", nextPoseOrientationZ
@@ -871,7 +880,7 @@ class MoveElektronModule():
 				robot_yaw = numpy.arctan2(point_in_robot.point.y, point_in_robot.point.x)
 				
 				thetaTime = abs(robot_yaw)/0.4
-				req_vel = elektron_msgs.MoveVelRequest()
+				req_vel = MoveVelRequest()
 				req_vel.velocity_x = 0
 				req_vel.velocity_y = 0
 				req_vel.velocity_theta = 0.4*numpy.sign(robot_yaw)
