@@ -27,7 +27,9 @@ sudo apt-get install -y ros-indigo-polled-camera;
 sudo apt-get install -y ros-indigo-camera-info-manager;
 sudo apt-get install -y ros-indigo-ros-core;
 sudo apt-get install -y ros-indigo-xacro;
-sudo apt-get install -y ros-indigo-robot-state-publisher
+sudo apt-get install -y ros-indigo-robot-state-publisher;
+sudo apt-get install -y ros-indigo-audio-common
+sudo apt-get install -y gstreamer-tools
 mkdir -p ~/rapp;
 mkdir -p ~/rapp/rapp-api/src ;
 cd ~/rapp/rapp-api/src;
