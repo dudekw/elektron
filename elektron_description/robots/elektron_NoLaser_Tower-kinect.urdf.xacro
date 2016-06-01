@@ -10,7 +10,7 @@
 	<property name="base_size_x" value="0.38" />
 	<property name="base_size_y" value="0.28" />
 	<property name="base_size_z" value="0.18" />
-
+	<xacro:arg name="use_sim" default="true" />
 	<property name="wheel_radius" value="0.05" />
 	<property name="wheel_length" value="0.02" />
 	<property name="caster_wheel_offset_y" value="0.1675" />
@@ -24,9 +24,11 @@
     <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
   	<!-- include gazebo control -->
 
-	<xacro:include filename="$(find elektron_control)/gazebo/elektron_gazebo_control.urdf.xacro"/>
-	<xacro:include filename="$(find elektron_control)/gazebo/tower_gazebo_control.urdf.xacro"/>
-
+	<xacro:if value="$(arg use_sim)">
+		<xacro:include filename="$(find elektron_gazebo)/urdf/elektron_gazebo_control.urdf.xacro"/>
+		<xacro:include filename="$(find elektron_gazebo)/urdf/tower_gazebo_control.urdf.xacro"/>
+ 			
+	</xacro:if>
 
 	<!-- ROBOT BASE DEFINITION -->
 	<link name="base_link">

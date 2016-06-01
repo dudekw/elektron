@@ -3,9 +3,9 @@
   <arg name="tower"/>
   <arg name="tower_sensor"/>
   <arg name="base"/> 
-
-  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_Tower-$(arg tower_sensor).urdf.xacro'" if="$(arg tower)"/>
-  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_NoTower.urdf.xacro'" unless="$(arg tower)"/>
+  <arg name="use_sim"/> 
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_Tower-$(arg tower_sensor).urdf.xacro' use_sim:=$(arg use_sim)" if="$(arg tower)"/>
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find elektron_description)/robots/$(arg base)_$(arg laser)_NoTower.urdf.xacro' use_sim:=$(arg use_sim)" unless="$(arg tower)"/>
   <param name="robot_description" command="$(arg urdf_file)" />
 
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">

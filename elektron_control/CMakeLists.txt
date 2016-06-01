@@ -5,7 +5,6 @@ project(elektron_control)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-gazebo_ros_control
 
 )
 
@@ -141,8 +140,8 @@ catkin_package(
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(DIRECTORY config/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config )
-install(DIRECTORY gazebo/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/gazebo )
+#install(DIRECTORY gazebo/
+ #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/gazebo )
 install(DIRECTORY launch/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch )
 

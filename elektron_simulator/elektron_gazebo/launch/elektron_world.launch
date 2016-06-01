@@ -31,6 +31,7 @@ TO DO
     <arg name="laser" value="$(arg laser)"/>
     <arg name="tower" value="$(arg tower)"/>
     <arg name="tower_sensor" value="$(arg tower_sensor)"/>
+ 	<arg name="use_sim" value="1"/> <!-- 0 - physical robot | 1 - simulation -->
   </include>
 
   <node name="control_subsystem_move_server" pkg="elektron_base" type="move_server.py" /> 
