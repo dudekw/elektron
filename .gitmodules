@@ -1,11 +1,3 @@
-[submodule "nf"]
-    path = elektron_base/real_effectors/src/nf
-    url = https://github.com/mwalecki/nf.git
-    branch = master
-[submodule "serialcomm"]
-    path = elektron_base/real_effectors/src/serialcomm
-    url = https://github.com/mwalecki/serialcomm.git
-    branch = master
 [submodule "rapp-api-elektron"]
     path = rapp-api-elektron
     url =  https://github.com/dudekw/rapp-api-elektron.git
@@ -14,4 +6,9 @@
     path = netusb_camera_driver
     url =  https://github.com/RCPRG-ros-pkg/netusb_camera_driver.git
     branch = master
-
+[submodule "elektron-real-effectors"]
+	path = elektron_base/elektron-real-effectors
+	url = https://github.com/dudekw/elektron-real-effectors.git
+[submodule "elektron-simulation"]
+	path = elektron-simulation
+	url = https://github.com/dudekw/elektron-simulation.git

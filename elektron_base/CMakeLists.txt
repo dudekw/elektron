@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   tf
-  roscpp
 rospy
 )
 
@@ -125,10 +124,6 @@ include_directories(
 # add_library(elektron_base
 #   src/${PROJECT_NAME}/elektron_base.cpp
 # )
- add_library(nfv2conf real_effectors/src/nfv2_config.c)
- add_library(serialcomm real_effectors/src/serialcomm/serialcomm.cpp)
- add_library(nfv2 real_effectors/src/nf/nfv2.c)
-
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -136,8 +131,6 @@ include_directories(
 
 ## Declare a C++ executable
 
-
- add_executable(elektron_base_re real_effectors/src/elektron_base_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -147,13 +140,6 @@ include_directories(
 # target_link_libraries(elektron_base_node
 #   ${catkin_LIBRARIES}
 # )
-
- target_link_libraries(elektron_base_re
-   ${catkin_LIBRARIES}
- )
-target_link_libraries(elektron_base_re
-  nfv2conf serialcomm nfv2
- )
 
  add_definitions("-std=gnu++11")
 #############
@@ -175,39 +161,9 @@ target_link_libraries(elektron_base_re
  )
 
 ## Mark executables and/or libraries for installation
- install(TARGETS elektron_base_re
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
+
 
 ## Mark executables and/or libraries for installation
- install(TARGETS nfv2conf
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
-
-## Mark executables and/or libraries for installation
- install(TARGETS nfv2 serialcomm
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
-
-## Mark cpp header files for installation
- install(DIRECTORY real_effectors/src/nf
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/nf
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
- )
-
-## Mark cpp header files for installation
- install(DIRECTORY real_effectors/src/serialcomm                              
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/serialcomm
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
- )
 
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
