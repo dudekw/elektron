@@ -102,8 +102,8 @@ class BaseEffectorModule():
 
 	def rapp_set_vel_interface(self,req):
 		
-		self.set_vel.linear.x = req.velocity_x*4
-		self.set_vel.angular.z = req.velocity_theta*12
+		self.set_vel.linear.x = req.velocity_x
+		self.set_vel.angular.z = req.velocity_theta
 		status = False
 		return MoveVelResponse(status)
 	def rapp_stop_vel_interface(self,req):
