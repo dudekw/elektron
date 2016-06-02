@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot name="tower_control_gazebo" xmlns:xacro="http://ros.org/wiki/xacro">
+	<!-- SET gazebo-ROS CONTROL -->
+  <xacro:macro name="tower_PID_control_gazebo">
+
+	<gazebo>
+	  	<plugin name="gazebo_ros_control_tower" filename="libgazebo_ros_control.so">
+	    	<robotNamespace>/tower</robotNamespace>
+	  	</plugin>
+	</gazebo>
+	<!-- ADD position CONTROLLER - left wheel -->
+	<transmission name="tran_effort_head_yaw_joint">
+		<type>effort_controllers/JointPositionController</type>
+		<joint name="head_yaw_revolute_joint_1">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor_head_yaw_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+	<!-- ADD position CONTROLLER - right wheel -->
+	<transmission name="tran_effort_head_pitch_joint">
+		<type>effort_controllers/JointPositionController</type>
+		<joint name="head_pitch_revolute_joint_1">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor_head_pitch_joint">
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
+      			<mechanicalReduction>1</mechanicalReduction>
+    		</actuator>
+  	</transmission>
+
+  	  </xacro:macro>
+
+  </robot>

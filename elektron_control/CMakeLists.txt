@@ -144,7 +144,8 @@ install(DIRECTORY config/
  #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/gazebo )
 install(DIRECTORY launch/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch )
-
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf )
 #############
 ## Testing ##
 #############
