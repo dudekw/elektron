@@ -15,7 +15,7 @@ int main(int argc, char ** argv){
 	joint_names.push_back("head_yaw");
 	joint_angles.push_back(1.57); // turn head in yaw to 1.57 rad orientation
 
-	nav.moveJoint(joint_names, joint_angles);
+	nav.move_joint(joint_names, joint_angles);
 
 	rapp::object::pose_stamped pose_start;
 	rapp::object::pose_stamped pose_mid;
@@ -35,14 +35,14 @@ int main(int argc, char ** argv){
 	pose_goal.pose.position.y = 0;
 	poses_list.push_back(pose_goal);
 	// move robot via combined path
-	nav.moveAlongPath(poses_list);
+	nav.move_along_path(poses_list);
 	//move robot to pose given in his frame
-	nav.moveTo(-2,0,0);
+	nav.move_to(-2,0,0);
 	// set robot speed to linear = 0.5, angular = 0.4
-	nav.moveVel(0.5,0.4);
+	nav.move_vel(0.5,0.4);
 	// wait 8 secs
 	sleep(5);
 	// stop move
-	nav.moveStop();
+	nav.move_stop();
 	return 0;
 }
