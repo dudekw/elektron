@@ -2,7 +2,7 @@
 <launch>
 
 	<!-- load base controller -->
-	<node name="elektron_base" pkg="elektron_real_effectors" type="elektron_base_re" respawn="true" output="screen">
+	<node name="elektron_base" pkg="elektron_real_effectors" type="elektron_base_re" respawn="true">
 		
 		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB0" />
 		<param name="sendLoopExecuteRate" type="double" value="200" />
