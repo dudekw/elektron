@@ -2,11 +2,9 @@
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
 sudo apt-get update
+sudo apt-get install -y git;
 sudo apt-get install -y libzbar-dev;
 sudo apt-get install -y ros-indigo-desktop-full;
-sudo apt-get remove -y gazebo2;
-sudo apt-get install -y libgazebo5-dev;
-sudo apt-get install -y gazebo5;
 sudo apt-get install -y ros-indigo-std-srvs;
 sudo apt-get install -y python-catkin-tools;
 sudo apt-get install -y ros-indigo-control-toolbox;
@@ -106,11 +104,11 @@ if [ -d "elektron" ]; then
 	cd ~/rapp/robots/src/elektron;
 	git pull;
 else
-	git clone https://github.com/dudekw/elektron.git;
+	git clone -b master https://github.com/dudekw/elektron.git;
 fi
 
 cd ~/rapp/robots/src/elektron;
-git submodule update --init -- gazebo_ros_pkgs elektron_base/real_effectors/src/nf elektron_base/real_effectors/src/serialcomm rapp-api-elektron;
+git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
