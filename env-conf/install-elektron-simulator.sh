@@ -111,7 +111,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
-git submodule update --init --recursive elektron-simulation
+git submodule update --init --recursive elektron-simulation;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;

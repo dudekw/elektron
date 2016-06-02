@@ -83,7 +83,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
-git submodule update --init -- gazebo_ros_pkgs elektron_base/real_effectors/src/nf elektron_base/real_effectors/src/serialcomm rapp-api-elektron;
+git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
