@@ -108,6 +108,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
+rm elektron_base/elektron-real-effectors/CMakeLists.txt;
 git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver rapp-api-elektron;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
