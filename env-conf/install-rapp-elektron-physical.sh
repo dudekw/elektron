@@ -109,7 +109,7 @@ fi
 
 cd ~/rapp/robots/src/elektron;
 
-git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver rapp-api-elektron;
+git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver rapp-api-elektron elektron_apps/elektron-rapps;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;
 cd ../..;
