@@ -111,6 +111,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
+touch elektron_base/elektron-real-effectors/CMakeLists.txt;
 git submodule update --init --recursive elektron-simulation rapp-api-elektron;
 source /opt/ros/indigo/setup.bash;
 source ~/rapp/rapp-api/install/setup.bash;

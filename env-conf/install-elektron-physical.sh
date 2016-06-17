@@ -37,6 +37,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
+
 git submodule update --init --recursive elektron_base/elektron-real-effectors netusb_camera_driver;
 source /opt/ros/indigo/setup.bash;
 cd ../..;

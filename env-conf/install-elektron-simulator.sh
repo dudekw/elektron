@@ -40,6 +40,7 @@ else
 fi
 
 cd ~/rapp/robots/src/elektron;
+touch elektron_base/elektron-real-effectors/CMakeLists.txt;
 git submodule update --init --recursive elektron-simulation;
 source /opt/ros/indigo/setup.bash;
 cd ../..;
