@@ -12,3 +12,6 @@
 [submodule "elektron-simulation"]
 	path = elektron-simulation
 	url = https://github.com/dudekw/elektron-simulation.git
+[submodule "elektron-rapps"]
+	path = elektron_apps/elektron-rapps
+	url = https://github.com/dudekw/elektron-rapps.git
