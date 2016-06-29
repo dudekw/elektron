@@ -2,19 +2,24 @@
 <launch>
 
 	<!-- load base controller -->
-	<node name="elektron_base" pkg="elektron_real_effectors" type="elektron_base_re" respawn="true">
+	<node name="elektron" pkg="elektron_base" type="elektron_base_node" respawn="true" output="screen">
 		
 		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB0" />
-		<param name="sendLoopExecuteRate" type="double" value="200" />
-		<param name="readDeviceVitalsRate" type="double" value="10" />
+		<param name="sendLoopExecuteRate" type="double" value="10" />
+		<param name="readDeviceVitalsRate" type="double" value="1" />
+
 		<param name="axleLength" type="double" value="0.314" />
-		<param name="encoderTicks" type="double" value="5000" />
+		<param name="encoderImpulses" type="double" value="20000" />
 		<param name="wheelDiameter" type="double" value="0.1" />
 		<param name="regulatorRate" type="double" value="100" />
-		<param name="commandTimeoutTime" type="double" value="3" />
-		<param name="timeoutCommandSendTime" type="double" value="1" />
+		<param name="maxLinearSpeed" type="double" value="0.254" />
+		<param name="maxAngularSpeed" type="double" value="0.87" />
+
+		<param name="commandTimeoutTime" type="double" value="10" />
+		<param name="timeoutCommandSendTime" type="double" value="5" />
+
 		<param name="publishOdometryTF" type="bool" value="true" />
-		<remap from="cmd_vel" to="/elektron/mobile_base_controller/cmd_vel"/>
+
 	</node>
 	
 	 
