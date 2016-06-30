@@ -21,15 +21,6 @@ else
 	git clone -b cpp https://github.com/rapp-project/rapp-robots-api.git;
 fi
 
-cd ~/rapp/rapp-api/src;
-
-if [ -d "rapp-cloud-api" ]; then
-	cd ~/rapp/rapp-api/src/rapp-cloud-api;
-	git pull;
-else
-	git clone https://github.com/maciek-slon/rapp-cloud-api.git;
-fi
-
 source /opt/ros/indigo/setup.bash;
 cd ~/rapp/rapp-api;
 
@@ -43,33 +34,6 @@ else
 	catkin init;
 	catkin config --cmake-args -DBUILD_ALL=ON;
 	catkin config --install;
-	catkin build;
-fi
-
-
-mkdir -p ~/rapp/rapp-apps/src;
-cd ~/rapp/rapp-apps/src;
-if [ -d "rapp-samples" ]; then
-	cd ~/rapp/rapp-api/src/rapp-samples;
-	git pull;
-else
-	git clone https://github.com/maciek-slon/rapp_sample.git rapp-samples;
-fi
-
-source ~/rapp/rapp-api/install/setup.bash;
-
-cd ~/rapp/rapp-apps;
-
-if [ -d "install" ]; then
-	catkin clean -y;
-	catkin init;
-	catkin config --install;
-	catkin config --isolate-install;
-	catkin build;
-else
-	catkin init;
-	catkin config --install;
-	catkin config --isolate-install;
 	catkin build;
 fi
 
