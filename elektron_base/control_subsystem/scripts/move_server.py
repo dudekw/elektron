@@ -74,7 +74,8 @@ class MoveElektronModule():
 		self.sub_obstacle = None
 		self.transformerROS = tf.TransformerROS(True, rospy.Duration(5.0))
 		self.tf_br = tf.TransformBroadcaster()
-
+		self.maxLinearSpeed = rospy.get_param('maxLinearSpeed')
+		self.maxAngularSpeed = rospy.get_param('maxAngularSpeed')
 
 	def openServices(self):
 		try:
@@ -142,6 +143,10 @@ class MoveElektronModule():
 #
 	def rapp_move_vel_interface(self,x,theta):
 		moveVel = rospy.ServiceProxy('/moveVel', MoveVel)
+		if x > self.maxLinearSpeed:
+			x = self.maxLinearSpeed
+		if theta > self.maxAngularSpeed:
+			theta = self.maxAngularSpeed			
 		resp1 = moveVel(x,0,theta)
 		return resp1.status
 
