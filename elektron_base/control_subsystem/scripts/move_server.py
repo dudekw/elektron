@@ -716,7 +716,10 @@ class MoveElektronModule():
 
 	def handle_rapp_takePredefinedPosture(self,req):
 		try:
-			status = self.rapp_take_predefined_posture_interface(req.pose)
+			if req.pose == "Zero":
+				status = self.rapp_move_tower_interface([0,0], ["head_pitch","head_yaw"])
+			else:
+				rospy.logwarn("Elektron does not support <<%s>> posture. Avaliable postures: <<Zero>>", req.pose)
 		except Exception, ex:
 			status = True
 			print "[Move server] - Exception %s" % str(ex)
