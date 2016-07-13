@@ -4,14 +4,17 @@
 	<arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
 	<arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR kinect)"/>  <!-- kinect, rgb  --> 
 
-  	<node name="control_subsystem_move_server" pkg="elektron_base" type="move_server.py" /> 
+  	<node name="control_subsystem_move_server" pkg="elektron_base" type="move_server.py">
+                <param name="maxLinearSpeed" type="double" value="0.254" />
+                <param name="maxAngularSpeed" type="double" value="0.87" />
+        </node> 
  	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
   	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py"  args="0"/>
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
 	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" />
 
   	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" output="screen" respawn="true">
-	<param name="elektron_tower_device" value="/dev/ttyUSB1"/>
+	<param name="/real_effector_tower/elektron_tower_device" value="/dev/ttyUSB1"/>
 </node>
   	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" output="screen" respawn = "true"/>
 
