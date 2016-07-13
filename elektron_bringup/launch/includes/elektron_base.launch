@@ -2,7 +2,7 @@
 <launch>
 
 	<!-- load base controller -->
-	<node name="elektron" pkg="elektron_real_effectors" type="elektron_base_re" respawn="true" output="screen">
+	<node name="elektron" pkg="elektron_real_effectors" type="elektron_base_re" respawn="true">
 		
 		<param name="drivesDriverAddress" type="string" value="/dev/ttyUSB0" />
 		<param name="sendLoopExecuteRate" type="double" value="10" />
@@ -19,7 +19,7 @@
 		<param name="timeoutCommandSendTime" type="double" value="5" />
 
 		<param name="publishOdometryTF" type="bool" value="true" />
-
+		<remap from="cmd_vel_absolute" to="/elektron/mobile_base_controller/cmd_vel"/>
 	</node>
 	
 	 
