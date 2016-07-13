@@ -54,12 +54,8 @@ class MoveElektronModule():
 		
 		# Checking existance of virtual receptors and effectors
 		self.checkSubsystems()
-		self.setVariables()
-
 		self.openServices()
-
-
-		print "[Move server] - Waits for clients ..."
+		self.setVariables()
 				
 	# Checking existance of virtual receptors and effectors
 	def checkSubsystems(self):
@@ -74,8 +70,20 @@ class MoveElektronModule():
 		self.sub_obstacle = None
 		self.transformerROS = tf.TransformerROS(True, rospy.Duration(5.0))
 		self.tf_br = tf.TransformBroadcaster()
-		self.maxLinearSpeed = rospy.get_param('maxLinearSpeed')
-		self.maxAngularSpeed = rospy.get_param('maxAngularSpeed')
+		if rospy.has_param('/control_subsystem_move_server/maxLinearSpeed'):
+			self.maxLinearSpeed = rospy.get_param('/control_subsystem_move_server/maxLinearSpeed')
+		else:
+			rospy.logerr("[Move server] - rosparam <<maxLinearSpeed>> not set, killing move_server node")
+
+			rospy.signal_shutdown("[Move server] - rosparam <<maxLinearSpeed>> not set, killing move_server node")
+
+		if rospy.has_param('/control_subsystem_move_server/maxAngularSpeed'):
+			self.maxAngularSpeed = rospy.get_param('/control_subsystem_move_server/maxAngularSpeed')
+		else:
+			rospy.logerr("[Move server] - rosparam <<maxAngularSpeed>> not set, killing move_server node")
+
+			rospy.signal_shutdown("[Move server] - rosparam <<maxAngularSpeed>> not set, killing move_server node")
+
 
 	def openServices(self):
 		try:
@@ -115,6 +123,7 @@ class MoveElektronModule():
 		except Exception, ex_lookAt:
 			print "[Move server] - Exception %s" % str(ex_lookAt)
 
+		print "[Move server] - Waits for clients ..."
 
 	# Event subscribtion
 	def subscribeToEvents(self):
@@ -948,3 +957,4 @@ if __name__ == "__main__":
 		main()
 	except Exception,e:
 		print "__name__ - Error %s" % str(e)
+
