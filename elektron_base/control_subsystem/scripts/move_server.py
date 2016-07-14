@@ -319,44 +319,49 @@ class MoveElektronModule():
 			print "Obstacle detected by LEFT BUMPER " 
 
 
+	  def calculatePathFollowingError(nextPose):
+	  		robotCurrentPosition = self.getRobotCurrentPosition()
+	  		error = numpy.sqrt((robotCurrentPosition[0][0]-nextPose.pose.position.x)*(robotCurrentPosition[0][0]-nextPose.pose.position.x)+(robotCurrentPosition[0][1]-nextPose.pose.position.y)*(robotCurrentPosition[0][1]-nextPose.pose.position.y))
+	  		return error
 
-	def plannPath(self,req):
-		robotCurrentPosition = [req.start_x,req.start_y,req.start_theta]#self.getRobotCurrentPosition()
-		start = PoseStamped()
-		goal = PoseStamped()
-		start.header.seq = 0
-		goal.header.seq = 0
-		start.header.stamp = rospy.Time.now()
-		goal.header.stamp = rospy.Time.now()
-		start.header.frame_id = "/world"
-		goal.header.frame_id = "/world"
-		start.pose.position.x = req.start_x#robotCurrentPosition[0][0]
-		start.pose.position.y = req.start_y#robotCurrentPosition[0][1]
-		start.pose.position.z = 0#robotCurrentPosition[0][2]
-		start_orientation_quaternion = tf.transformations.quaternion_from_euler(0,0,req.start_theta) 
 
-		start.pose.orientation.x = start_orientation_quaternion[0]
-		start.pose.orientation.y = start_orientation_quaternion[1]
-		start.pose.orientation.z = start_orientation_quaternion[2]
-		start.pose.orientation.w = start_orientation_quaternion[3]
-		goal.pose.position.x = req.finish_x
-		goal.pose.position.y = req.finish_y
-		goal.pose.position.z = 0
-		goal_orientation_quaternion = tf.transformations.quaternion_from_euler(0,0,req.finish_theta) 
-		goal.pose.orientation.x = goal_orientation_quaternion[0]
-		goal.pose.orientation.y = goal_orientation_quaternion[1]
-		goal.pose.orientation.z = goal_orientation_quaternion[2]
-		goal.pose.orientation.w = goal_orientation_quaternion[3]
-		print "tu jest start \n",start
-		print "tu jest goal \n",goal
-		path = numpy.array(PoseStamped())
-		print "sdsanaskd"
-		plan_path = rospy.ServiceProxy('/global_planner/make_plan', MakeNavPlan)
-		print "okmpmmlkmvxc ssdf "
-		path_resp = plan_path(start,goal)
-		print "response:", path_resp.path
-		print type(path_resp)
-		return PlannPathResponse(path_resp.plan_found,path_resp.error_message, path_resp.path)
+	# def plannPath(self,req):
+	# 	robotCurrentPosition = [req.start_x,req.start_y,req.start_theta]#self.getRobotCurrentPosition()
+	# 	start = PoseStamped()
+	# 	goal = PoseStamped()
+	# 	start.header.seq = 0
+	# 	goal.header.seq = 0
+	# 	start.header.stamp = rospy.Time.now()
+	# 	goal.header.stamp = rospy.Time.now()
+	# 	start.header.frame_id = "/world"
+	# 	goal.header.frame_id = "/world"
+	# 	start.pose.position.x = req.start_x#robotCurrentPosition[0][0]
+	# 	start.pose.position.y = req.start_y#robotCurrentPosition[0][1]
+	# 	start.pose.position.z = 0#robotCurrentPosition[0][2]
+	# 	start_orientation_quaternion = tf.transformations.quaternion_from_euler(0,0,req.start_theta) 
+
+	# 	start.pose.orientation.x = start_orientation_quaternion[0]
+	# 	start.pose.orientation.y = start_orientation_quaternion[1]
+	# 	start.pose.orientation.z = start_orientation_quaternion[2]
+	# 	start.pose.orientation.w = start_orientation_quaternion[3]
+	# 	goal.pose.position.x = req.finish_x
+	# 	goal.pose.position.y = req.finish_y
+	# 	goal.pose.position.z = 0
+	# 	goal_orientation_quaternion = tf.transformations.quaternion_from_euler(0,0,req.finish_theta) 
+	# 	goal.pose.orientation.x = goal_orientation_quaternion[0]
+	# 	goal.pose.orientation.y = goal_orientation_quaternion[1]
+	# 	goal.pose.orientation.z = goal_orientation_quaternion[2]
+	# 	goal.pose.orientation.w = goal_orientation_quaternion[3]
+	# 	print "tu jest start \n",start
+	# 	print "tu jest goal \n",goal
+	# 	path = numpy.array(PoseStamped())
+	# 	print "sdsanaskd"
+	# 	plan_path = rospy.ServiceProxy('/global_planner/make_plan', MakeNavPlan)
+	# 	print "okmpmmlkmvxc ssdf "
+	# 	path_resp = plan_path(start,goal)
+	# 	print "response:", path_resp.path
+	# 	print type(path_resp)
+	# 	return PlannPathResponse(path_resp.plan_found,path_resp.error_message, path_resp.path)
 
 	def followPath(self,path):			
 		status = "start"
@@ -451,10 +456,15 @@ class MoveElektronModule():
 					if self.obstacle_detected == True:
 						print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 						return status
+				# if path following error in any point reaches eps > 0.3 m, repeat movement to this point 
+				path_following_error = self.calculatePathFollowingError(nextPose)
+				if (path_following_error > 0.3):
+					i = i - 1
 			else:
 				print "can't transform base_link to map frame" 
 				status = "transformation error"
 				return status
+
 		# if an obstacle was detected break path following and return status
 		if self.obstacle_detected == True:
 			print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
@@ -957,4 +967,3 @@ if __name__ == "__main__":
 		main()
 	except Exception,e:
 		print "__name__ - Error %s" % str(e)
-
