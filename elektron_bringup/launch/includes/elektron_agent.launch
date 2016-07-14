@@ -9,6 +9,11 @@
                 <param name="maxAngularSpeed" type="double" value="0.87" />
         </node> 
  	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
+ 	<node name="laser_scan_matcher" pkg="laser_scan_matcher" type="laser_scan_matcher_node">
+	        <param name="publish_pose_stamped" type="bool" value="true" />
+                <param name="fixed_frame" type="string" value="odom" />
+		<remap from="scan" to="laser_scan"/>
+	</node>
   	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py"  args="0"/>
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
 	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" />
