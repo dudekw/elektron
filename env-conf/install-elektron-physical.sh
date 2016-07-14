@@ -4,7 +4,7 @@ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA
 sudo apt-get update
 sudo apt-get install -y git;
 sudo apt-get install -y libzbar-dev;
-sudo apt-get install -y ros-indigo-desktop-full;
+sudo apt-get install -y ros-indigo-desktop;
 sudo apt-get install -y ros-indigo-std-srvs;
 sudo apt-get install -y python-catkin-tools;
 sudo apt-get install -y ros-indigo-control-toolbox;
