@@ -26,6 +26,7 @@ sudo apt-get install -y ros-indigo-camera-info-manager;
 sudo apt-get install -y ros-indigo-ros-core;
 sudo apt-get install -y ros-indigo-xacro;
 sudo apt-get install -y ros-indigo-robot-state-publisher
+sudo apt-get install -y ros-indigo-laser-scan-matcher
 
 mkdir -p ~/rapp/robots/src;
 cd ~/rapp/robots/src;
