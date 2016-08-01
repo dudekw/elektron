@@ -319,10 +319,10 @@ class MoveElektronModule():
 			print "Obstacle detected by LEFT BUMPER " 
 
 
-	  def calculatePathFollowingError(nextPose):
-	  		robotCurrentPosition = self.getRobotCurrentPosition()
-	  		error = numpy.sqrt((robotCurrentPosition[0][0]-nextPose.pose.position.x)*(robotCurrentPosition[0][0]-nextPose.pose.position.x)+(robotCurrentPosition[0][1]-nextPose.pose.position.y)*(robotCurrentPosition[0][1]-nextPose.pose.position.y))
-	  		return error
+	def calculatePathFollowingError(nextPose):
+	  	robotCurrentPosition = self.getRobotCurrentPosition()
+	  	error = numpy.sqrt((robotCurrentPosition[0][0]-nextPose.pose.position.x)*(robotCurrentPosition[0][0]-nextPose.pose.position.x)+(robotCurrentPosition[0][1]-nextPose.pose.position.y)*(robotCurrentPosition[0][1]-nextPose.pose.position.y))
+	  	return error
 
 
 	# def plannPath(self,req):
