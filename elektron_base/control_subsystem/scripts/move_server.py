@@ -319,10 +319,21 @@ class MoveElektronModule():
 			print "Obstacle detected by LEFT BUMPER " 
 
 
-	def calculatePathFollowingError(nextPose):
+	def calculatePathFollowingError(self,nextPose):
 	  	robotCurrentPosition = self.getRobotCurrentPosition()
 	  	error = numpy.sqrt((robotCurrentPosition[0][0]-nextPose.pose.position.x)*(robotCurrentPosition[0][0]-nextPose.pose.position.x)+(robotCurrentPosition[0][1]-nextPose.pose.position.y)*(robotCurrentPosition[0][1]-nextPose.pose.position.y))
+	  	print "current ERROR ====== ",error 
 	  	return error
+
+	def calculatePoseAngleError(self,nextPose):
+	 	robotCurrentPosition = self.getRobotCurrentPosition()
+	 	current_orient = tf.transformations.euler_from_quaternion(robotCurrentPosition[1]) 
+	 	goal_orient = tf.transformations.euler_from_quaternion([nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]) 
+	 	error = numpy.arctan2(numpy.sin(goal_orient[2]-current_orient[2]), numpy.cos(goal_orient[2]-current_orient[2]))
+	  	print "End orientation ERROR ====== ",error 
+	  	return error
+
+
 
 
 	# def plannPath(self,req):
@@ -366,7 +377,8 @@ class MoveElektronModule():
 	def followPath(self,path):			
 		status = "start"
 		print path
-		for i in range((len(path)-1)):
+		i = 0
+		while i < (len(path)):
 		# OLD		
 		#for i in range(int(numpy.ceil(len(path)/(20)))+1):
 		#int(numpy.floor(len(path.path)/200))+1):
@@ -388,7 +400,8 @@ class MoveElektronModule():
 				print "[Path tracker] - getting to next point:\n ", point_number," / ", (len(path)-1)
 				print "start:\n ",robotCurrentPosition[0][0],robotCurrentPosition[0][1]
 				print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
-
+				self.tf_br.sendTransform([nextPose.pose.position.x,nextPose.pose.position.y,nextPose.pose.position.z],[nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w],
+                                         rospy.Time.now(), "GOAL", "/world")
 				x_A = robotCurrentPosition[0][0]
 				y_A = robotCurrentPosition[0][1]
 				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
@@ -418,8 +431,8 @@ class MoveElektronModule():
 				#                 rotation more then 20 deg and goal distance more then 0.1 m || next pose is the goal || next pose is the first pose
 				should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.1) or (point_number == len(path)-1) or  (point_number == 1)
 				if (should_move):
-					# rotate with velocity = 0.4 rad/sec 
-					thetaTime = abs(theta)/0.4
+					# rotate with velocity = 0.2 rad/sec 
+					thetaTime = abs(theta)/0.2
 					resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta))
 					#self.proxy_motion.move(0,0,0.3*numpy.sign(theta))
 					
@@ -435,11 +448,11 @@ class MoveElektronModule():
 						
 						thetaTime_now = thetaTime_now + 0.1
 					self.rapp_stop_move_interface()
-					# move forward with velocity - 0.08 m/s
+					# move forward with velocity - 0.02 m/s
 					print "pojscie na AB"
-					move_X_time = AB/0.4
+					move_X_time = AB/0.2
 					if self.obstacle_detected == False:
-						resp = self.rapp_move_vel_interface(0.4,0)
+						resp = self.rapp_move_vel_interface(0.2,0)
 			
 						move_X_time_now = 0
 						while (move_X_time-move_X_time_now)>0:
@@ -456,10 +469,12 @@ class MoveElektronModule():
 					if self.obstacle_detected == True:
 						print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 						return status
-				# if path following error in any point reaches eps > 0.3 m, repeat movement to this point 
+				# if path following error in any point reaches eps > 0.2 m, repeat movement to this point 
 				path_following_error = self.calculatePathFollowingError(nextPose)
-				if (path_following_error > 0.3):
-					i = i - 1
+				if (path_following_error > 0.2):
+					i=i-1
+					print "ERROR VALUE BIGGER THEN EPS, REPEATING POINT"
+				i=i+1
 			else:
 				print "can't transform base_link to map frame" 
 				status = "transformation error"
@@ -475,28 +490,40 @@ class MoveElektronModule():
 		nextPose = path[len(path)-1]
 		nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
 		print nextPose
-		robotCurrentPosition = self.getRobotCurrentPosition()
-		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
-		print "last point orientation: \n", nextPoseOrientationZ
-		theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
-		if abs(theta2) > 3.14:
-			print"\n theta > 3.14\n"
-			theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
 
-		# rotate with velocity = 0.4 rad/sec 
-		theta2_Time = abs(theta2)/0.4
-			
-		resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
-		
-		thetaTime_now = 0
-		while (theta2_Time-thetaTime_now)>0:
-			if self.obstacle_detected == True:
-				status = "obstacle"
-				break	
-			rospy.sleep(0.1)
+		# init end_pose_orient_error
+		end_pose_orient_error = 1
+
+		# orient robot to the end pose orientation
+		while (end_pose_orient_error >= 0.1):
+
+			robotCurrentPosition = self.getRobotCurrentPosition()
+			robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
+			print "last point orientation: \n", nextPoseOrientationZ
+			theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
+			if abs(theta2) > 3.14:
+				print"\n theta > 3.14\n"
+				theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
+
+			# rotate with velocity = 0.4 rad/sec 
+			theta2_Time = abs(theta2)/0.2
 				
-			thetaTime_now = thetaTime_now + 0.1
-		self.rapp_stop_move_interface()
+			resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
+			
+			thetaTime_now = 0
+			while (theta2_Time-thetaTime_now)>0:
+				if self.obstacle_detected == True:
+					status = "obstacle"
+					break	
+				rospy.sleep(0.1)
+					
+				thetaTime_now = thetaTime_now + 0.1
+			self.rapp_stop_move_interface()
+
+			# update end orientation error
+			end_pose_orient_error = self.calculatePoseAngleError(nextPose)
+			if (end_pose_orient_error >= 0.1):
+				print "ERROR VALUE BIGGER THEN EPS, REPITING POINT"
 
 		if status == "obstacle":
 			return status
