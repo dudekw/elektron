@@ -25,5 +25,7 @@
   	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" output="screen" respawn = "true"/>
 
 	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch"/>
+<!-- <include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch"/>
+-->
 
 </launch>
