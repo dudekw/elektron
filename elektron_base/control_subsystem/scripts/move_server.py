@@ -38,6 +38,9 @@ import geometry_msgs
 	
 
 #######################################
+class pathFollowingStatus(status_, lastPoint_);
+	status = status_
+	lastPoint = lastPoint_
 
 class MoveElektronModule():
 	""" A simple module able to react to
@@ -207,6 +210,19 @@ class MoveElektronModule():
 			return False
 		else:
 			return True
+#
+#
+#   Interfaces to service handlers
+#
+#
+
+	def send_rapp_moveTo_request(self,pose):
+		pose_RAPP = MoveToRequest()
+		pose_RAPP.x = pose[0]
+		pose_RAPP.y = pose[1]
+		pose_RAPP.theta = pose[2]
+		status = self.handle_rapp_moveTo(pose_RAPP)
+		return status
 ####
 ##  SERVECE HANDLERS
 ####
@@ -275,55 +291,88 @@ class MoveElektronModule():
 		self.path_is_finished = False
 		self.kill_thread_followPath = False
 		self.obstacle_detected = False
-
+		inGoal = False
 		self.followPath_flag = 'empty'
 		rate_mainThread = rospy.Rate(1)
 
 		#self.rapp_take_predefined_posture_interface('StandInit',0.3)
 		
-		self.subscribeToObstacle()
-		
-		pathFollowingStatus = self.followPath(req.poses)
-		
-		self.unsubscribeToObstacle()
+		while (inGoal !=True):
+			self.subscribeToObstacle()
+			
+			followStatus = self.followPath(req.poses)
+			
+			self.unsubscribeToObstacle()
 
-		if pathFollowingStatus == "finished":
-			status = False
-		elif pathFollowingStatus == "transformation error":
-			print "Transformation error!!!!!!!!!!"
-			status = True			
-		else:
-			print "BUG BUG BUG BUG BUG BUG BUG BUG \n BUG BUG BUG BUG BUG BUG"
-			status = True
-
+			if followStatus.status == "finished":
+				status = False
+				inGoal == True
+			elif followStatus.status == "transformation error":
+				print "Transformation error!!!!!!!!!!"
+				status = True			
+			else:
+				print "BUG BUG BUG BUG BUG BUG BUG BUG \n BUG BUG BUG BUG BUG BUG"
+				self.avoidObstacle(0.3, 1.5)
+				self.returnToPath(followStatus.lastPoint, req.poses)
+				status = True
 		return MoveAlongPathResponse(status)
 
 	def detectObstacle(self,msg):
 		# while (self.path_is_finished != True): 
 		# sonar data = [right_dist, left_dist]
-		sum_data = 0
-		i = 0
 
-		if (msg.RightBumper == 1):
-			#self.unsubscribeToObstacle()
-			self.obstacle_detected = True
-			self.kill_thread_followPath = True
+		self.obstacle_detected = True
+		self.kill_thread_followPath = True
+		if (msg.obstaclePose == 0):
 			self.rapp_stop_move_interface()
-
-			print "Obstacle detected by RIGHT BUMPER " 
-		elif ( msg.LeftBumper==1):
-			#self.unsubscribeToObstacle()
-			self.obstacle_detected = True
-			self.kill_thread_followPath = True
+			print "Obstacle detected on the left " 
+		elif (msg.obstaclePose == 1):
+			print "Obstacle detected on the right" 
 			self.rapp_stop_move_interface()
-			print "Obstacle detected by LEFT BUMPER " 
+		self.obstaclePose = msg.obstaclePose
 
+ 
 
-	def calculatePathFollowingError(nextPose):
+	def calculatePathFollowingError(self,nextPose):
 	  	robotCurrentPosition = self.getRobotCurrentPosition()
 	  	error = numpy.sqrt((robotCurrentPosition[0][0]-nextPose.pose.position.x)*(robotCurrentPosition[0][0]-nextPose.pose.position.x)+(robotCurrentPosition[0][1]-nextPose.pose.position.y)*(robotCurrentPosition[0][1]-nextPose.pose.position.y))
+	  	print "current ERROR ====== ",error 
 	  	return error
 
+	def calculatePoseAngleError(self,nextPose):
+	 	robotCurrentPosition = self.getRobotCurrentPosition()
+	 	current_orient = tf.transformations.euler_from_quaternion(robotCurrentPosition[1]) 
+	 	goal_orient = tf.transformations.euler_from_quaternion([nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]) 
+	 	error = numpy.arctan2(numpy.sin(goal_orient[2]-current_orient[2]), numpy.cos(goal_orient[2]-current_orient[2]))
+	  	print "End orientation ERROR ====== ",error 
+	  	return error
+
+
+	def avoidObstacle(self, diagonal, forward)
+		robotCurrentPosition = self.getRobotCurrentPosition()
+		# obstacle is on the left, move to the point (CPx - 0.3 m, CPy - 0.3 m) | CPx - X component of current pose, CPy - Y component of current pose
+		if (self.obstaclePose == 0):
+			self.send_rapp_moveTo_request([-diagonal, -diagonal, 0])
+
+		# obstacle is on the left, move to the point (CPx - 0.3 m, CPy + 0.3 m) | CPx - X component of current pose, CPy - Y component of current pose, 
+		elif (self.obstaclePose == 1):
+			self.send_rapp_moveTo_request([-diagonal, diagonal, 0])
+		# and move forward 1.5 m
+		self.send_rapp_moveTo_request([forward, 0, 0])
+
+
+	def returnToPath(lastPoint, path):
+		i = 1
+		while (i <= 10):		
+			current_point = lastPoint + i
+			point_dist =  self.calculatePathFollowingError(path[current_point])
+			if point_dist < min_dist:
+				min_dist = point_dist
+		nextPoint = current_point
+		path_req = MoveAlongPathRequest()
+		pose_zero = PoseStamped()
+		path_req.poses = [pose_zero, path[current_point]]
+		resp = self.handle_rapp_MoveAlongPath(path_req)
 
 	# def plannPath(self,req):
 	# 	robotCurrentPosition = [req.start_x,req.start_y,req.start_theta]#self.getRobotCurrentPosition()
@@ -366,7 +415,8 @@ class MoveElektronModule():
 	def followPath(self,path):			
 		status = "start"
 		print path
-		for i in range((len(path)-1)):
+		i = 0
+		while i < (len(path)):
 		# OLD		
 		#for i in range(int(numpy.ceil(len(path)/(20)))+1):
 		#int(numpy.floor(len(path.path)/200))+1):
@@ -388,7 +438,8 @@ class MoveElektronModule():
 				print "[Path tracker] - getting to next point:\n ", point_number," / ", (len(path)-1)
 				print "start:\n ",robotCurrentPosition[0][0],robotCurrentPosition[0][1]
 				print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
-
+				self.tf_br.sendTransform([nextPose.pose.position.x,nextPose.pose.position.y,nextPose.pose.position.z],[nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w],
+                                         rospy.Time.now(), "GOAL", "/world")
 				x_A = robotCurrentPosition[0][0]
 				y_A = robotCurrentPosition[0][1]
 				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
@@ -418,8 +469,8 @@ class MoveElektronModule():
 				#                 rotation more then 20 deg and goal distance more then 0.1 m || next pose is the goal || next pose is the first pose
 				should_move = (abs(theta) > 20*numpy.pi/180 and AB > 0.1) or (point_number == len(path)-1) or  (point_number == 1)
 				if (should_move):
-					# rotate with velocity = 0.4 rad/sec 
-					thetaTime = abs(theta)/0.4
+					# rotate with velocity = 0.2 rad/sec 
+					thetaTime = abs(theta)/0.2
 					resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta))
 					#self.proxy_motion.move(0,0,0.3*numpy.sign(theta))
 					
@@ -435,11 +486,11 @@ class MoveElektronModule():
 						
 						thetaTime_now = thetaTime_now + 0.1
 					self.rapp_stop_move_interface()
-					# move forward with velocity - 0.08 m/s
+					# move forward with velocity - 0.02 m/s
 					print "pojscie na AB"
-					move_X_time = AB/0.4
+					move_X_time = AB/0.2
 					if self.obstacle_detected == False:
-						resp = self.rapp_move_vel_interface(0.4,0)
+						resp = self.rapp_move_vel_interface(0.2,0)
 			
 						move_X_time_now = 0
 						while (move_X_time-move_X_time_now)>0:
@@ -455,54 +506,71 @@ class MoveElektronModule():
 					# if an obstacle was detected during movement to this point break path following and return status
 					if self.obstacle_detected == True:
 						print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-						return status
-				# if path following error in any point reaches eps > 0.3 m, repeat movement to this point 
+						end_status = pathFollowingStatus(status,i)
+						return end_status
+				# if path following error in any point reaches eps > 0.2 m, repeat movement to this point 
 				path_following_error = self.calculatePathFollowingError(nextPose)
-				if (path_following_error > 0.3):
-					i = i - 1
+				if (path_following_error > 0.2):
+					i=i-1
+					print "ERROR VALUE BIGGER THEN EPS, REPEATING POINT"
+				i=i+1
 			else:
 				print "can't transform base_link to map frame" 
-				status = "transformation error"
-				return status
+				end_status = pathFollowingStatus("transformation error",i)
+				return end_status
 
 		# if an obstacle was detected break path following and return status
 		if self.obstacle_detected == True:
 			print "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-			return status
+			end_status = pathFollowingStatus("transformation error",i)
+			return end_status
 		# if at goal position, rotate to the goal orientation
 		
 		print "nawrotka na kierunek koncowy"
 		nextPose = path[len(path)-1]
 		nextRotation = [nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w]
 		print nextPose
-		robotCurrentPosition = self.getRobotCurrentPosition()
-		robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
-		print "last point orientation: \n", nextPoseOrientationZ
-		theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
-		if abs(theta2) > 3.14:
-			print"\n theta > 3.14\n"
-			theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
 
-		# rotate with velocity = 0.4 rad/sec 
-		theta2_Time = abs(theta2)/0.4
-			
-		resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
-		
-		thetaTime_now = 0
-		while (theta2_Time-thetaTime_now)>0:
-			if self.obstacle_detected == True:
-				status = "obstacle"
-				break	
-			rospy.sleep(0.1)
+		# init end_pose_orient_error
+		end_pose_orient_error = 1
+
+		# orient robot to the end pose orientation
+		while (end_pose_orient_error >= 0.1):
+
+			robotCurrentPosition = self.getRobotCurrentPosition()
+			robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
+			print "last point orientation: \n", nextPoseOrientationZ
+			theta2 = nextPoseOrientationZ - robot_orientation_euler[2]
+			if abs(theta2) > 3.14:
+				print"\n theta > 3.14\n"
+				theta2 = theta2-(numpy.sign(theta2)*2*numpy.pi)
+
+			# rotate with velocity = 0.4 rad/sec 
+			theta2_Time = abs(theta2)/0.2
 				
-			thetaTime_now = thetaTime_now + 0.1
-		self.rapp_stop_move_interface()
+			resp = self.rapp_move_vel_interface(0,0.4*numpy.sign(theta2))
+			
+			thetaTime_now = 0
+			while (theta2_Time-thetaTime_now)>0:
+				if self.obstacle_detected == True:
+					status = "obstacle"
+					break	
+				rospy.sleep(0.1)
+					
+				thetaTime_now = thetaTime_now + 0.1
+			self.rapp_stop_move_interface()
+
+			# update end orientation error
+			end_pose_orient_error = self.calculatePoseAngleError(nextPose)
+			if (end_pose_orient_error >= 0.1):
+				print "ERROR VALUE BIGGER THEN EPS, REPITING POINT"
 
 		if status == "obstacle":
-			return status
+			end_status = pathFollowingStatus("obstacle",i)
+			return end_status
 		else:
-			status = "finished"
-			return status
+			end_status = pathFollowingStatus("finished",i)
+			return end_status
 	# def followPath2(self,path):			
 	# 	status = "start"
 	# 	for i in range(int(numpy.ceil(len(path)/(20)))+1):
