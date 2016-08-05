@@ -1,2 +1,1 @@
-sensor_msgs/PointCloud pointCloud
-sensor_msgs/LaserScan laserScan
+int8 obstaclePose
