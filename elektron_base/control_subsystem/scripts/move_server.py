@@ -38,9 +38,15 @@ import geometry_msgs
 	
 
 #######################################
-class pathFollowingStatus(status_, lastPoint_);
-	status = status_
-	lastPoint = lastPoint_
+
+class pathFollowingStatus():
+	def __init__(self,status_,lastPoint_):
+		self.status = status_
+		self.lastPoint = lastPoint_
+	def status(self):
+		return self.status
+	def lastPoint(self):
+		return self.lastPoint
 
 class MoveElektronModule():
 	""" A simple module able to react to
@@ -348,7 +354,7 @@ class MoveElektronModule():
 	  	return error
 
 
-	def avoidObstacle(self, diagonal, forward)
+	def avoidObstacle(self, diagonal, forward):
 		robotCurrentPosition = self.getRobotCurrentPosition()
 		# obstacle is on the left, move to the point (CPx - 0.3 m, CPy - 0.3 m) | CPx - X component of current pose, CPy - Y component of current pose
 		if (self.obstaclePose == 0):
@@ -363,6 +369,7 @@ class MoveElektronModule():
 
 	def returnToPath(lastPoint, path):
 		i = 1
+		# calculate distance from current pose to the 10 points of planned trajectory
 		while (i <= 10):		
 			current_point = lastPoint + i
 			point_dist =  self.calculatePathFollowingError(path[current_point])
