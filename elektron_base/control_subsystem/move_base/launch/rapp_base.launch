@@ -1,0 +1,13 @@
+<launch>
+
+ <!---<group ns="move_">
+
+</group>-->
+
+  <!--- Remappings for Robot Footprint -->
+  <node pkg="move_base" type="move_base" name="move_base_node" output="screen">
+<rosparam command="load" file="$(find move_base)/launch/base_local_planner_params.yaml" />
+<rosparam command="load" file="$(find move_base)/launch/costmap_common_params.yaml" />
+<rosparam command="load" file="$(find move_base)/launch/local_costmap_params.yaml" />
+  </node>
+</launch>
