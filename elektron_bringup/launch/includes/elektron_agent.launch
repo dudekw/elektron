@@ -27,5 +27,21 @@
 	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch"/>
 <!-- <include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch"/>
 -->
+<arg name="nodelet_manager_name" value="nodelet_manager"/>
+
+ <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+
+  <node pkg="nodelet" type="nodelet" name="yocs_cmd_vel_mux"
+        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet nodelet_manager" output="screen">
+    <param name="yaml_cfg_file" value="$(find elektron_navigation)/param/cmd_mux_gazebo_config.yaml"/>
+<remap from="/yocs_cmd_vel_mux/mux_vel_keyboard/cmd_vel" to="/mux_vel_keyboard/cmd_vel"/>
+<remap from="/yocs_cmd_vel_mux/mux_vel_nav/cmd_vel" to="/mux_vel_nav/cmd_vel"/>
+<remap from="/yocs_cmd_vel_mux/mux_vel_raw/cmd_vel" to="/mux_vel_raw/cmd_vel"/>
+<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
+
+  </node>
+
+
+
 
 </launch>

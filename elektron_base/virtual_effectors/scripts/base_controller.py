@@ -39,7 +39,7 @@ class BaseEffectorModule():
 	"""
 	
 	# Constructor of MoveNaoModule
-	def __init__(self,name,use_sim):
+	def __init__(self,name):
 		print "[Base effector] - Virtual effector <<Base>> initialization"
 		
 		# Initialization of ROS node
@@ -47,7 +47,7 @@ class BaseEffectorModule():
 		
 		# Initialization of Naoqi modules and ROS services
 		self.checkSubsystems()
-		self.setVariables(use_sim)
+		self.setVariables()
 
 		self.openServices()
 
@@ -66,6 +66,7 @@ class BaseEffectorModule():
 		self.pub_vel = rospy.Publisher(topic, Twist, queue_size=10)
 		self.set_vel = Twist()
 		self.vel_pub = Twist()
+		self.trigger_publishing = False
 	def openServices(self):
 		try:
 			print "[Base effector] - setting services"
@@ -125,7 +126,7 @@ def signal_handler(signal, frame):
 	print "[Base effector] - system exits"
 	sys.exit(0)
 
-def main(use_sim):
+def main():
 	""" Main entry point
 		"""
 	try:
@@ -134,7 +135,7 @@ def main(use_sim):
 		#self.use_sim = use_sim
 		rospy.init_node('acore_base_effector')
 		global ElektronBaseMove
-		ElektronBaseMove = BaseEffectorModule("ElektronBaseMove",use_sim)
+		ElektronBaseMove = BaseEffectorModule("ElektronBaseMove")
 		rate = rospy.Rate(10)
 		while not rospy.is_shutdown():
 			ElektronBaseMove.velPublisher()
