@@ -92,29 +92,32 @@ class BaseEffectorModule():
 		finally:
 			termios.tcsetattr(fd, termios.TCSADRAIN, old)
 	def velPublisher(self):
-		self.vel_pub = self.set_vel
 		if (self.trigger_publishing):
-			self.pub_vel.publish(self.vel_pub)
+			self.pub_vel.publish(self.set_vel)
+
+
 ####
 ##  SERVECE HANDLERS
 ####
 
 	def rapp_set_vel_interface(self,req):
 		if (req.velocity_x == 0 and req.velocity_theta == 0):
-			status = self.rapp_stop_vel_interface(req)
-			return MoveVelResponse(status)
+			req_stop = MoveStopRequest()
+			status = self.rapp_stop_vel_interface(req_stop)
+
+			return MoveVelResponse(status.status)
 		else:
-			self.trigger_publishing = True
 			self.set_vel.linear.x = req.velocity_x
 			self.set_vel.angular.z = req.velocity_theta
+			self.trigger_publishing = True
+
 			status = False
 			return MoveVelResponse(status)
 	def rapp_stop_vel_interface(self,req):
-		self.triger_publishing = True
 		self.set_vel.linear.x = 0
 		self.set_vel.angular.z = 0
-		while (self.vel_pub != self.set_vel):
-			rospy.sleep(0.1)
+		self.triger_publishing = True
+		self.velPublisher()
 		self.trigger_publishing = False
 
 		status = False
