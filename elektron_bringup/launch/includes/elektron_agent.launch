@@ -15,7 +15,7 @@
                 <param name="use_odom" type="bool" value="false" />
 		<remap from="scan" to="laser_scan"/>
 	</node>
-  	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py"  args="0"/>
+  	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py" />
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
 	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" />
 

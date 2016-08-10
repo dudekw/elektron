@@ -59,17 +59,13 @@ class BaseEffectorModule():
 		print "[Base effector] - Checking existance of real effectors -> not implemented"
 
 	# Setting variables
-	def setVariables(self,use_sim):
+	def setVariables(self):
 		print "[Base effector] - Setting variables"
 		self.moveJoint = rospy.ServiceProxy('moveVel', MoveTower)
-		if (use_sim == "0"):
-			topic = "/elektron/mobile_base_controller/cmd_vel"
-		elif (use_sim == "1"):
-			topic = "/elektron/mobile_base_controller/cmd_vel"	
-		else:
-			print("wrong node initialization usage: base_controller <<use_simulation_real_base_effector>> (1 - simulation|| 0 - real elektron)")
+		topic = "/mux_vel_raw/cmd_vel"
 		self.pub_vel = rospy.Publisher(topic, Twist, queue_size=10)
 		self.set_vel = Twist()
+		self.vel_pub = Twist()
 	def openServices(self):
 		try:
 			print "[Base effector] - setting services"
@@ -95,21 +91,31 @@ class BaseEffectorModule():
 		finally:
 			termios.tcsetattr(fd, termios.TCSADRAIN, old)
 	def velPublisher(self):
-		self.pub_vel.publish(self.set_vel)
+		self.vel_pub = self.set_vel
+		if (self.trigger_publishing):
+			self.pub_vel.publish(self.vel_pub)
 ####
 ##  SERVECE HANDLERS
 ####
 
 	def rapp_set_vel_interface(self,req):
-		
-		self.set_vel.linear.x = req.velocity_x
-		self.set_vel.angular.z = req.velocity_theta
-		status = False
-		return MoveVelResponse(status)
+		if (req.velocity_x == 0 and req.velocity_theta == 0):
+			status = self.rapp_stop_vel_interface(req)
+			return MoveVelResponse(status)
+		else:
+			self.trigger_publishing = True
+			self.set_vel.linear.x = req.velocity_x
+			self.set_vel.angular.z = req.velocity_theta
+			status = False
+			return MoveVelResponse(status)
 	def rapp_stop_vel_interface(self,req):
-		
+		self.triger_publishing = True
 		self.set_vel.linear.x = 0
 		self.set_vel.angular.z = 0
+		while (self.vel_pub != self.set_vel):
+			rospy.sleep(0.1)
+		self.trigger_publishing = False
+
 		status = False
 		return MoveStopResponse(status)
 
@@ -147,9 +153,6 @@ def main(use_sim):
 		
 if __name__ == "__main__":
 	try:
-		if len(sys.argv) < 2:
-			print("usage: base_controller <<use_simulation_real_base_effector>> (1 - simulation|| 0 - real elektron)")
-		else:
-			main(sys.argv[1])
+		main()
 	except Exception,e:
 		print "__name__ - Error %s" % str(e)
