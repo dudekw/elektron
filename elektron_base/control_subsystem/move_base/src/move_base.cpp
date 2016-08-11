@@ -59,9 +59,9 @@ namespace move_base {
     dp_->initialize("my_dwa_planner", &tf, costmap_);
 
     ROS_INFO("STARTING MY SERVICE");
-
+    std::string node_name = ros::this_node::getName();
     moveAlongPath_srv_ = nh_.advertiseService("rapp_moveAlongPath_ros", &MoveBase::MoveAlongPath_handler, this);
-    vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/elektron/mobile_base_controller/cmd_vel", 1);
+    vel_pub_ = nh_.advertise<geometry_msgs::Twist>(node_name+"/cmd_vel", 1);
 }
 void MoveBase::publishZeroVelocity(){
     geometry_msgs::Twist cmd_vel;
@@ -71,13 +71,43 @@ void MoveBase::publishZeroVelocity(){
     vel_pub_.publish(cmd_vel);
 }
 void MoveBase::recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist &cmd_vel){
+    ros::Duration time_dur;
+    ros::Time time_1;
+    ros::Time time_2;
+
     while(nh_.ok())
     {
       cmd_vel.angular.z = 0.4;
       vel_pub_.publish(cmd_vel);
+      costmap_->resetLayers();
+      costmap_->start();
       comp_vel_status = dp_->computeVelocityCommands(cmd_vel);
-      if (comp_vel_status)
-        return;
+      if (comp_vel_status){
+        time_1 = ros::Time::now();
+        while (time_dur > ros::Duration(2)){
+          cmd_vel.angular.z = 0.4;
+          vel_pub_.publish(cmd_vel);
+          time_2 = ros::Time::now();
+          time_dur = time_1 - time_2;
+        }
+        costmap_->resetLayers();
+        costmap_->start();
+        comp_vel_status = dp_->computeVelocityCommands(cmd_vel);
+        if (comp_vel_status){
+        //   time_1 = ros::Time::now();
+        //   while (time_dur > ros::Duration(2)){
+        //     cmd_vel.angular.z = 0.0;
+        //     cmd_vel.linear.x = 0.05;
+        //     vel_pub_.publish(cmd_vel);
+        //     time_2 = ros::Time::now();
+        //     time_dur = time_1 - time_2;
+        //   }
+        //   costmap_->resetLayers();
+        //   costmap_->start();
+          return;
+        
+        }
+      }
     }
 }
   bool MoveBase::MoveAlongPath_handler(elektron_msgs::MoveAlongPath::Request &req, elektron_msgs::MoveAlongPath::Response &resp)
