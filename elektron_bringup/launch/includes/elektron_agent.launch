@@ -45,7 +45,7 @@
 		<remap from="/yocs_cmd_vel_mux/mux_vel_keyboard/cmd_vel" to="/mux_vel_keyboard/cmd_vel"/>
 		<remap from="/yocs_cmd_vel_mux/mux_vel_nav/cmd_vel" to="$(arg publish_nav_vel_topic)"/>
 		<remap from="/yocs_cmd_vel_mux/mux_vel_raw/cmd_vel" to="/mux_vel_raw/cmd_vel"/>
-		<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
+		<remap from="/cmd_vel_absolute" to="/cmd_vel_absolute"/>
 	</node>
 
 	
