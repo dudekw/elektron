@@ -1,6 +1,8 @@
 my_dwa_planner:
   max_vel_x: 0.15
   min_vel_x: 0.01
+  max_vel_y: 0
+  min_vel_y: 0
   max_rotational_vel: 0.2
   min_in_place_rotational_vel: 0.05
 

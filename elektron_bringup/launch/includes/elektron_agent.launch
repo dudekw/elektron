@@ -8,39 +8,50 @@
                 <param name="maxLinearSpeed" type="double" value="0.254" />
                 <param name="maxAngularSpeed" type="double" value="0.87" />
         </node> 
+
  	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
+
  	<node name="laser_scan_matcher" pkg="laser_scan_matcher" type="laser_scan_matcher_node">
 	        <param name="publish_pose_stamped" type="bool" value="true" />
                 <param name="fixed_frame" type="string" value="odom" />
                 <param name="use_odom" type="bool" value="false" />
 		<remap from="scan" to="laser_scan"/>
 	</node>
+
   	<node name="virtual_effector_base_controller" pkg="elektron_base" type="base_controller.py" />
+
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
+
 	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" />
 
   	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" output="screen" respawn="true">
-	<param name="/real_effector_tower/elektron_tower_device" value="/dev/ttyUSB1"/>
-</node>
-  	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" output="screen" respawn = "true"/>
+		<param name="/real_effector_tower/elektron_tower_device" value="/dev/ttyUSB1"/>
+	</node>
+  	
+	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" output="screen" respawn = "true"/>
 
 	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch"/>
-<!-- <include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch"/>
--->
-<arg name="nodelet_manager_name" value="nodelet_manager"/>
+	
+	<!-- <include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch"/>
+	-->
+	
+	<arg name="nodelet_manager_name" value="nodelet_manager"/>
+	<arg name="publish_nav_vel_topic" value="/mux_vel_nav/cmd_vel"/>
 
- <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+	<node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" args="manager" />
 
-  <node pkg="nodelet" type="nodelet" name="yocs_cmd_vel_mux"
-        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet nodelet_manager" output="screen">
-    <param name="yaml_cfg_file" value="$(find elektron_navigation)/param/cmd_mux_gazebo_config.yaml"/>
-<remap from="/yocs_cmd_vel_mux/mux_vel_keyboard/cmd_vel" to="/mux_vel_keyboard/cmd_vel"/>
-<remap from="/yocs_cmd_vel_mux/mux_vel_nav/cmd_vel" to="/mux_vel_nav/cmd_vel"/>
-<remap from="/yocs_cmd_vel_mux/mux_vel_raw/cmd_vel" to="/mux_vel_raw/cmd_vel"/>
-<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
+  	<node pkg="nodelet" type="nodelet" name="yocs_cmd_vel_mux" args="load yocs_cmd_vel_mux/CmdVelMuxNodelet $(arg nodelet_manager_name)">
+    		<param name="yaml_cfg_file" value="$(find elektron_navigation)/param/cmd_mux_gazebo_config.yaml"/>
+		<remap from="/yocs_cmd_vel_mux/mux_vel_keyboard/cmd_vel" to="/mux_vel_keyboard/cmd_vel"/>
+		<remap from="/yocs_cmd_vel_mux/mux_vel_nav/cmd_vel" to="$(arg publish_nav_vel_topic)"/>
+		<remap from="/yocs_cmd_vel_mux/mux_vel_raw/cmd_vel" to="/mux_vel_raw/cmd_vel"/>
+		<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
+	</node>
 
-  </node>
-
+	
+	<include file="$(find elektron_bringup)/launch/includes/rapp_move_base.launch">
+		<arg name="publish_vel_topic" value="$(arg publish_nav_vel_topic)"/>
+	</include>
 
 
 
