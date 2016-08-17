@@ -48,7 +48,7 @@
 		-->
 		<arg name="camera_id" default="0" />
 
-		<arg name="color_mode" value="rgb24" />
+		<arg name="color_mode" default="rgb24" />
 
 		<!-- Trigger mode: 'streaming', 'software' or 'hardware' -->
 		<arg name="trigger_mode" default="streaming" />
