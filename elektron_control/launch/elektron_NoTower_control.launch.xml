@@ -10,7 +10,7 @@
 <!-- spawn controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" ns="/$(arg base)" args="joint_state_controller mobile_base_controller ">
-<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute">
+<remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
   </node>
  <!-- avaliable wheel position controllers: head_pitch_position_controller, head_yaw_position_controller, left_wheel_position_controller right_wheel_position_controller. mobile_base_controller does not cooperate with position controllers -->
  

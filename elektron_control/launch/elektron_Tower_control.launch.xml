@@ -10,7 +10,7 @@
 <!-- spawn base controllers -->
   <node name="base_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" ns="/$(arg base)" args="joint_state_controller mobile_base_controller ">
-    <remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute">
+    <remap from="/elektron/mobile_base_controller/cmd_vel" to="/cmd_vel_absolute"/>
   </node>
 <!-- spawn tower controllers -->
   <node name="tower_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
