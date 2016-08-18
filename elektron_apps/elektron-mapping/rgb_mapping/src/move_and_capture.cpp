@@ -13,14 +13,16 @@
 #include <sstream>
 #include <stdlib.h>
 #include <ros/console.h>
-void move(float x, float vel, ros::ServiceClient *client){
+#include <boost/filesystem.hpp>
+
+void move(float x, float vel, ros::ServiceClient &client){
 	float interval = x/vel;
 	elektron_msgs::MoveVel srv;
   	srv.request.velocity_x = vel;
   	srv.request.velocity_y = 0;
   	srv.request.velocity_theta = 0;
 	
-	if (client->call(srv))
+	if (client.call(srv))
 	{
 		ROS_INFO_STREAM("Move status: "<< srv.response.status);
 	}
@@ -34,7 +36,7 @@ void move(float x, float vel, ros::ServiceClient *client){
   	srv.request.velocity_y = 0;
   	srv.request.velocity_theta = 0;
 
-	if (client->call(srv))
+	if (client.call(srv))
 	{
 		ROS_INFO_STREAM("Stop status: "<< srv.response.status);
 	}
@@ -93,19 +95,20 @@ void saveImage(std::string path, sensor_msgs::Image ros_image){
 	cv::imwrite( path, cv_image );
 }
 
-void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &client_capture, ros::ServiceClient &client_moveJoint){
+void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &client_capture, ros::ServiceClient &client_moveJoint,std::string pic_folder_path){
 	sensor_msgs::Image ros_image;
 	float angle = 0;
 	std::string img_path;
-	img_path = "mapped_pic/" + pointId;
-	int i = iterate_init;
+	img_path = pic_folder_path + "/" + pointId;
+	int i = 0;
 	std::string orient_id;
 	std::ostringstream ss;
 
-	for(i; i < iterate_init + 6; i++){
-		angle = -M_PI/2 + i * 12 * M_PI/180;
-	
+	for(i; i <  6; i++){
+		angle = -(-M_PI/2 + i * 30 * M_PI/180);
+		std::cout<< "angle :"<<angle<<std::endl;
 		moveCamera( angle, client_moveJoint);
+		ros::Duration(4).sleep();
 		ros_image = capture(client_capture);
 		if (iterate_init == 0){
 			if (i > 3){
@@ -114,15 +117,16 @@ void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &clie
 				orient_id = ss.str();
 			}
 			else{
-				ss.str("0");
+				ss.str("");
 				ss << 3 - i;
-				orient_id = ss.str();
+				orient_id = "0"+ss.str();
+				std::cout<<img_path + "_" + orient_id + ".jpg"<<std::endl;
 			}
 			saveImage(img_path + "_" + orient_id + ".jpg",ros_image );
 		}
 		else {
 			ss.str("0");
-			ss << 18 - i;
+			ss << 9 - i;
 			orient_id = ss.str(); 
 			saveImage(img_path + "_0" + orient_id + ".jpg",ros_image);
 		}
@@ -135,7 +139,15 @@ ros::NodeHandle nh;
 std::cout << "Usage: <<direction>> <<row_ID>>, direction: 0-> to E || 9-> to W"<< std::endl;
 ros::ServiceClient client_moveVel = nh.serviceClient<elektron_msgs::MoveVel>("rapp_moveVel");
 ros::ServiceClient client_moveJoint = nh.serviceClient<elektron_msgs::MoveJoint>("rapp_moveJoint");
-ros::ServiceClient client_capture = nh.serviceClient<elektron_msgs::GetImage>("rapp_captureImage");
+ros::ServiceClient client_capture = nh.serviceClient<elektron_msgs::GetImage>("rapp_capture_image");
+std::string pic_folder_path = "./mapped_pic"; 
+
+
+const char *dir_path = pic_folder_path.c_str();
+	boost::filesystem::path dir(dir_path);
+	if(boost::filesystem::create_directory(dir)) {
+		std::cout << "Success" << "\n";
+	}
 
 int direction = atoi(argv[1]);
 std::string pointID = "";
@@ -145,10 +157,18 @@ ss.str("");
 int row = atoi(argv[2]);
 ss<<row;
 
-for (int i = 0; i < cols; i++ ){
+for (int i = 0; i <= cols; i++ ){
 	ss << i;
 	pointID = ss.str();
-	handlePoint(direction, pointID, client_capture, client_moveJoint);
+	handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
+	moveCamera( M_PI/2 , client_moveJoint);
+	if (i==cols)
+		break;
+	move(0.5, 0.08, client_moveVel);
+	ss.str("");
+	int row = atoi(argv[2]);
+	ss<<row;
+
 }
 return 0;
 }
