@@ -153,13 +153,18 @@ std::string pointID = "";
 int rows = 50;
 std::ostringstream ss;
 ss.str("");
-int col = atoi(argv[2]);
-
+//int col = atoi(argv[2]);
+//if (col<10)
+ std::string col_str(argv[2]);
+std::cout<<"col: "<< col_str<<std::endl;
 if (direction == 9){
 	for (int i = 10; i <= rows; i+=1 ){
 		ss.str("");
-		ss << i + "_" + col;
+		ss << i;
+		ss << "_";
+		ss << col_str.c_str();
 		pointID = ss.str();
+std::cout<<"pointID: "<<pointID<<std::endl;
 		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
 		moveCamera( M_PI/2 , client_moveJoint);
 		if (i==rows)
@@ -172,13 +177,15 @@ if (direction == 9){
 	}
 }
 if (direction == 0){
-	for (int i = rows; i <= 10; i-=1 ){
-		ss.str("");
-		ss << i + "_" + col;
+	for (int i = rows; i >= 10; i-=1 ){
+                ss.str("");
+                ss << i;
+                ss << "_";
+                ss << col_str.c_str();
 		pointID = ss.str();
 		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
 		moveCamera( M_PI/2 , client_moveJoint);
-		if (i==rows)
+		if (i==10)
 			break;
 		move(0.1, 0.05, client_moveVel);
 		// ss.str("");
