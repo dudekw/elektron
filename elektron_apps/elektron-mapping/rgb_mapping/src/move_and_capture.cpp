@@ -100,11 +100,10 @@ void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &clie
 	float angle = 0;
 	std::string img_path;
 	img_path = pic_folder_path + "/" + pointId;
-	int i = 0;
 	std::string orient_id;
 	std::ostringstream ss;
 
-	for(i; i <  6; i++){
+	for(int i = 0 ; i <  6; i++){
 		angle = -(-M_PI/2 + i * 30 * M_PI/180);
 		std::cout<< "angle :"<<angle<<std::endl;
 		moveCamera( angle, client_moveJoint);
@@ -136,7 +135,7 @@ void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &clie
 int main(int argc, char** argv){
 ros::init(argc, argv, "my_node_name");
 ros::NodeHandle nh;
-std::cout << "Usage: <<direction>> <<row_ID>>, direction: 0-> to E || 9-> to W"<< std::endl;
+std::cout << "Usage: <<direction>> <<col_ID>>, direction: 0-> to E || 9-> to W"<< std::endl;
 ros::ServiceClient client_moveVel = nh.serviceClient<elektron_msgs::MoveVel>("rapp_moveVel");
 ros::ServiceClient client_moveJoint = nh.serviceClient<elektron_msgs::MoveJoint>("rapp_moveJoint");
 ros::ServiceClient client_capture = nh.serviceClient<elektron_msgs::GetImage>("rapp_capture_image");
@@ -151,24 +150,42 @@ const char *dir_path = pic_folder_path.c_str();
 
 int direction = atoi(argv[1]);
 std::string pointID = "";
-int cols = 9;
+int rows = 50;
 std::ostringstream ss;
 ss.str("");
-int row = atoi(argv[2]);
-ss<<row;
+int col = atoi(argv[2]);
 
-for (int i = 0; i <= cols; i++ ){
-	ss << i;
-	pointID = ss.str();
-	handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
-	moveCamera( M_PI/2 , client_moveJoint);
-	if (i==cols)
-		break;
-	move(0.5, 0.08, client_moveVel);
-	ss.str("");
-	int row = atoi(argv[2]);
-	ss<<row;
+if (direction == 9){
+	for (int i = 10; i <= rows; i+=1 ){
+		ss.str("");
+		ss << i + "_" + col;
+		pointID = ss.str();
+		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
+		moveCamera( M_PI/2 , client_moveJoint);
+		if (i==rows)
+			break;
+		move(0.1, 0.05, client_moveVel);
+		// ss.str("");
+		// int col = atoi(argv[2]);
+		// ss<<col;
 
+	}
+}
+if (direction == 0){
+	for (int i = rows; i <= 10; i-=1 ){
+		ss.str("");
+		ss << i + "_" + col;
+		pointID = ss.str();
+		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
+		moveCamera( M_PI/2 , client_moveJoint);
+		if (i==rows)
+			break;
+		move(0.1, 0.05, client_moveVel);
+		// ss.str("");
+		// int col = atoi(argv[2]);
+		// ss<<col;
+
+	}
 }
 return 0;
 }
