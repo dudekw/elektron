@@ -84,8 +84,8 @@ class ElektronEstimator():
 			status = True
 			return GetTransformResponse(actual_pose)		
 		try:
-			if self.tl.canTransform(space,req.chainName,rospy.Time()):
-				ekf_pose = self.tl.lookupTransform(space,req.chainName,rospy.Time())
+			if self.tl.canTransform(req.chainName,space,rospy.Time()):
+				ekf_pose = self.tl.lookupTransform(req.chainName,space,rospy.Time())
 				actual_pose.pose.position.x = ekf_pose[0][0]
 				actual_pose.pose.position.y = ekf_pose[0][1]
 				actual_pose.pose.position.z = ekf_pose[0][2]
