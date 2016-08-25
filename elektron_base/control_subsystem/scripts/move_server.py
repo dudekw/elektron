@@ -263,7 +263,7 @@ class MoveElektronModule():
 			time = rospy.Time()
 			
 			
-			if(self.tl.canTransform("world", "base_link", rospy.Time())):
+			if(self.tl.canTransform("map", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
 				path_req = MoveAlongPathRequest()
 				pose_zero = PoseStamped()
@@ -274,7 +274,7 @@ class MoveElektronModule():
 				pose_req.pose.position.z = 0
 				pose_req.pose.orientation = tf.transformations.quaternion_from_euler(0,0,req.theta)
 				print "requested = ",req.theta
-				pose_in_map = self.transformPose("/world", pose_req,time)
+				pose_in_map = self.transformPose("/map", pose_req,time)
 				path_req.poses = [pose_zero, pose_in_map]
 				resp = self.handle_rapp_MoveAlongPath(path_req)
 
@@ -389,8 +389,8 @@ class MoveElektronModule():
 	# 	goal.header.seq = 0
 	# 	start.header.stamp = rospy.Time.now()
 	# 	goal.header.stamp = rospy.Time.now()
-	# 	start.header.frame_id = "/world"
-	# 	goal.header.frame_id = "/world"
+	# 	start.header.frame_id = "/map"
+	# 	goal.header.frame_id = "/map"
 	# 	start.pose.position.x = req.start_x#robotCurrentPosition[0][0]
 	# 	start.pose.position.y = req.start_y#robotCurrentPosition[0][1]
 	# 	start.pose.position.z = 0#robotCurrentPosition[0][2]
@@ -446,7 +446,7 @@ class MoveElektronModule():
 				print "start:\n ",robotCurrentPosition[0][0],robotCurrentPosition[0][1]
 				print "finish:\n",nextPose.pose.position.x,nextPose.pose.position.y
 				self.tf_br.sendTransform([nextPose.pose.position.x,nextPose.pose.position.y,nextPose.pose.position.z],[nextPose.pose.orientation.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w],
-                                         rospy.Time.now(), "GOAL", "/world")
+                                         rospy.Time.now(), "GOAL", "/map")
 				x_A = robotCurrentPosition[0][0]
 				y_A = robotCurrentPosition[0][1]
 				robot_orientation_euler = tf.transformations.euler_from_quaternion(robotCurrentPosition[1])
@@ -610,9 +610,9 @@ class MoveElektronModule():
 	# 		nextPoseOrientationZ = tf.transformations.euler_from_quaternion(nextRotation)[2]#.x,nextPose.pose.orientation.y,nextPose.pose.orientation.z,nextPose.pose.orientation.w)[2]
 	# 		nextPose_POSE = PoseStamped()
 	# 		cos = PoseStamped()
-	# 		nextPose_POSE.header.frame_id = "world"
-	# 		nextPose_POSE.header.stamp = self.tl.getLatestCommonTime("world","base_link")
-	# 		print "time: ",self.tl.getLatestCommonTime("world","base_link")
+	# 		nextPose_POSE.header.frame_id = "map"
+	# 		nextPose_POSE.header.stamp = self.tl.getLatestCommonTime("map","base_link")
+	# 		print "time: ",self.tl.getLatestCommonTime("map","base_link")
 	# 		nextPose_POSE = nextPose
 	# 		# nextPose_POSE.pose.position.y = robotCurrentPosition[0][1]
 	# 		# nextPose_POSE.pose.position.z = robotCurrentPosition[0][2]
@@ -620,10 +620,10 @@ class MoveElektronModule():
 	# 		# nextPose_POSE.pose.orientation.y = robotCurrentPosition[1][1]
 	# 		# nextPose_POSE.pose.orientation.z = robotCurrentPosition[1][2]
 	# 		# nextPose_POSE.pose.orientation.w = robotCurrentPosition[1][3]
-	# 		# while not self.tl.canTransform("world","base_link",rospy.Time.now()):
+	# 		# while not self.tl.canTransform("map","base_link",rospy.Time.now()):
 	# 		# 	rospy.sleep(1)
-	# 		if self.tl.canTransform("world","base_link",self.tl.getLatestCommonTime("world","base_link")):
-	# 			#torso_position = self.tl.lookupTransform("world","base_link",rospy.Time())
+	# 		if self.tl.canTransform("map","base_link",self.tl.getLatestCommonTime("map","base_link")):
+	# 			#torso_position = self.tl.lookupTransform("map","base_link",rospy.Time())
 	# 			#print numpy.dot(torso_position,nextPose_POSE)
 	# 			#cos.setData(torso_position*nextPose_POSE)
 
@@ -741,8 +741,8 @@ class MoveElektronModule():
 	# 		status = "finished"
 	# 		return status
 	def getRobotCurrentPosition(self):
-		if self.tl.canTransform("world","base_link",rospy.Time()):
-			robot_pose = self.tl.lookupTransform("world","base_link",rospy.Time())
+		if self.tl.canTransform("map","base_link",rospy.Time()):
+			robot_pose = self.tl.lookupTransform("map","base_link",rospy.Time())
 			robot_euler = tf.transformations.euler_from_quaternion(robot_pose[1])
 		# ekf_euler - orientation from EKF
 		# robot_euler - orientation from Odometry
@@ -755,8 +755,8 @@ class MoveElektronModule():
 			robot_position = []
 			return robot_position
 	def getCameraCurrentPosition(self):
-		if self.tl.canTransform("world","rgb_head_1",rospy.Time()):
-			camera_position = self.tl.lookupTransform("world","rgb_head_1",rospy.Time())
+		if self.tl.canTransform("map","rgb_head_1",rospy.Time()):
+			camera_position = self.tl.lookupTransform("map","rgb_head_1",rospy.Time())
 			return camera_position
 		else:
 			print "can't transform rgb_head_1 to map frame" 
@@ -835,7 +835,7 @@ class MoveElektronModule():
 		pointY = point[1]
 		pointZ = point[2]
 		dest_point = PointStamped()
-		dest_point.header.frame_id = "/world"
+		dest_point.header.frame_id = "/map"
 		dest_point.header.seq = 0
 		dest_point.header.stamp = now
 		dest_point.point.x = point[0]
@@ -843,9 +843,9 @@ class MoveElektronModule():
 		dest_point.point.z = point[2]
 
 		self.tf_br.sendTransform(point, [0,0,0,1],
-                                         rospy.Time.now(), "POINT", "/world")
+                                         rospy.Time.now(), "POINT", "/map")
 
-		if(self.tl.canTransform("head_bottom_fixed_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_revolute_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_fixed_link_1", "world", now) and self.tl.canTransform("head_upper_fixed_link_1", "rgb_head_1", now) ):
+		if(self.tl.canTransform("head_bottom_fixed_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_revolute_link_1","rgb_head_1", now) and self.tl.canTransform("head_upper_fixed_link_1", "map", now) and self.tl.canTransform("head_upper_fixed_link_1", "rgb_head_1", now) ):
 			point_in_head_yaw = self.transformPoint("head_bottom_fixed_link_1", dest_point,now)
 
 			point_in_head_pitch = self.transformPoint("head_pitch_setting_link_1", dest_point,now)
@@ -891,7 +891,7 @@ class MoveElektronModule():
 			# robot_orientation_euler = tf.transformations.euler_from_quaternion(nao_position[1])
 
 			# camera_in_fixed_head_pitch_transform = self.tl.lookupTransform("base_link","rgb_head_1",rospy.Time())
-			# camera_in_Map_transform = self.tl.lookupTransform("world","rgb_head_1",rospy.Time())
+			# camera_in_Map_transform = self.tl.lookupTransform("map","rgb_head_1",rospy.Time())
 			# camera_Map_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_Map_transform[1])
 
 			# camera_in_robot_orientation_euler = tf.transformations.euler_from_quaternion(camera_in_fixed_head_pitch_transform[1])
@@ -978,7 +978,7 @@ class MoveElektronModule():
 				#  compute robot yaw angle. Based on MMAR publication
 				###
 				dest_point = PointStamped()
-				dest_point.header.frame_id = "world"
+				dest_point.header.frame_id = "map"
 				dest_point.point.x = pointX
 				dest_point.point.y = pointY
 				dest_point.point.z = pointZ

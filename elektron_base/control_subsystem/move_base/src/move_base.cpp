@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *         Mike Phillips (put the planner in its own thread)
 *********************************************************************/
-#include <move_base/my_base.h>
+#include <rapp_move_base/my_base.h>
 #include <cmath>
 
 #include <boost/algorithm/string.hpp>
@@ -46,9 +46,9 @@
 #include <elektron_msgs/MoveAlongPathResponse.h>
 #include <elektron_msgs/MoveAlongPath.h>
 
-namespace move_base {
+namespace rapp_move_base {
 
-  MoveBase::MoveBase(tf::TransformListener& tf){
+  RappMoveBase::RappMoveBase(tf::TransformListener& tf){
     // costmap_2d::Costmap2DROS costmap("my_costmap", tf);
     // costmap.pause();
     costmap_ = new costmap_2d::Costmap2DROS("my_costmap", tf);
@@ -60,17 +60,17 @@ namespace move_base {
 
     ROS_INFO("STARTING MY SERVICE");
     std::string node_name = ros::this_node::getName();
-    moveAlongPath_srv_ = nh_.advertiseService("rapp_moveAlongPath_ros", &MoveBase::MoveAlongPath_handler, this);
+    moveAlongPath_srv_ = nh_.advertiseService("rapp_moveAlongPath_ros", &RappMoveBase::MoveAlongPath_handler, this);
     vel_pub_ = nh_.advertise<geometry_msgs::Twist>(node_name+"/cmd_vel", 1);
 }
-void MoveBase::publishZeroVelocity(){
+void RappMoveBase::publishZeroVelocity(){
     geometry_msgs::Twist cmd_vel;
     cmd_vel.linear.x = 0.0;
     cmd_vel.linear.y = 0.0;
     cmd_vel.angular.z = 0.0;
     vel_pub_.publish(cmd_vel);
 }
-void MoveBase::recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist &cmd_vel){
+void RappMoveBase::recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist &cmd_vel){
     ros::Duration time_dur;
     ros::Time time_1;
     ros::Time time_2;
@@ -110,7 +110,7 @@ void MoveBase::recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist &cmd
       }
     }
 }
-  bool MoveBase::MoveAlongPath_handler(elektron_msgs::MoveAlongPath::Request &req, elektron_msgs::MoveAlongPath::Response &resp)
+  bool RappMoveBase::MoveAlongPath_handler(elektron_msgs::MoveAlongPath::Request &req, elektron_msgs::MoveAlongPath::Response &resp)
   {
     // costmap_->resume();
 
@@ -176,14 +176,14 @@ ros::Time last_Invalid_control;
     // lock.unlock();
 
     //if the node is killed then we'll abort and return
-    //as_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on the goal because the node has been killed");
+    //as_->setAborted(rapp_move_base_msgs::RappMoveBaseResult(), "Aborting on the goal because the node has been killed");
     costmap_->pause();
 
     resp.status = false;
     return false;
   }
 
-  MoveBase::~MoveBase(){
+  RappMoveBase::~RappMoveBase(){
 
   }
 

@@ -53,8 +53,8 @@ class ElektronEstimator():
 
 		actual_pose = PoseStamped()
 		try:
-			if self.tl.canTransform("world","base_link",rospy.Time()):
-				ekf_pose = self.tl.lookupTransform("world","base_link",rospy.Time())
+			if self.tl.canTransform("map","base_link",rospy.Time()):
+				ekf_pose = self.tl.lookupTransform("map","base_link",rospy.Time())
 				actual_pose.pose.position.x = ekf_pose[0][0]
 				actual_pose.pose.position.y = ekf_pose[0][1]
 				actual_pose.pose.position.z = ekf_pose[0][2]
@@ -65,7 +65,7 @@ class ElektronEstimator():
 
 				actual_pose.header.seq = 1
 				actual_pose.header.stamp= rospy.Time.now()
-				actual_pose.header.frame_id = "world"
+				actual_pose.header.frame_id = "map"
 			else:
 				status = True
 			status = False
@@ -79,7 +79,7 @@ class ElektronEstimator():
 		if req.space == 0:
 			space = "base_link"
 		elif req.space == 1:
-			space = "world"
+			space = "map"
 		else:
 			status = True
 			return GetTransformResponse(actual_pose)		
@@ -167,7 +167,7 @@ class ElektronEstimator():
 	def publishOdom(self):
 
 		self.tf_br.sendTransform(self.odom_transformation.position, self.odom_transformation.orientation,
-                                         rospy.Time.now(), "odom", "world")
+                                         rospy.Time.now(), "world1", "world")
 def signal_handler(signal, frame):
 	print "[Estimator server] - signal SIGINT caught"
 	print "[Estimator server] - system exits"

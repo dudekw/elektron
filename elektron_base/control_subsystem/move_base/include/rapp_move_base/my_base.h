@@ -6,21 +6,21 @@
 #include <tf/transform_listener.h>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <dwa_local_planner/dwa_planner_ros.h>
-namespace move_base {
+namespace rapp_move_base {
 
- class MoveBase {
+ class RappMoveBase {
     public:
       /**
        * @brief  Constructor for the actions
        * @param name The name of the action
        * @param tf A reference to a TransformListener
        */
-      MoveBase(tf::TransformListener& tf);
+      RappMoveBase(tf::TransformListener& tf);
 
       /**
        * @brief  Destructor - Cleans up
        */
-      virtual ~MoveBase();
+      virtual ~RappMoveBase();
 void recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist &cmd_vel);
 
 
