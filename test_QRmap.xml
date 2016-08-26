@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog SYSTEM "catalog.dtd">
+<QRcodes>
+<QR>
+<x>2</x>
+<y>2</y>
+<z>0</z>
+
+<ox>0</ox>
+<oy>0</oy>
+<oz>0</oz>
+<ow>1</ow>
+
+<label>Door 2</label>
+</QR>
+<QR>
+<x>0</x>
+<y>0</y>
+<z>0</z>
+
+<ox>0</ox>
+<oy>0</oy>
+<oz>0</oz>
+<ow>1</ow>
+
+<label>"Door 3"</label>
+</QR>
+<QR>
+<x>0</x>
+<y>0</y>
+<z>0</z>
+
+<ox>0</ox>
+<oy>0</oy>
+<oz>0</oz>
+<ow>1</ow>
+
+<label>"example3"</label>
+</QR>
+<QR>
+<x>0</x>
+<y>0</y>
+<z>0</z>
+
+<ox>0</ox>
+<oy>0</oy>
+<oz>0</oz>
+<ow>1</ow>
+
+<label>"example4"</label>
+</QR>
+</QRcodes>
