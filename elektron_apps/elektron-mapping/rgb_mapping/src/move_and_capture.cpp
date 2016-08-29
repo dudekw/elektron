@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <ros/console.h>
 #include <boost/filesystem.hpp>
+#include <iostream> 
+#include <stdio.h>  
 
 void move(float x, float vel, ros::ServiceClient &client){
 	float interval = x/vel;
@@ -31,7 +33,7 @@ void move(float x, float vel, ros::ServiceClient &client){
 		ROS_ERROR_STREAM("Failed to call service rapp_moveVel -> setting velocity aborted");
 	}
 
-	ros::Duration(interval).sleep();
+	ros::Duration(2).sleep();
   	srv.request.velocity_x = 0;
   	srv.request.velocity_y = 0;
   	srv.request.velocity_theta = 0;
@@ -132,6 +134,25 @@ void handlePoint(int iterate_init, std::string pointId, ros::ServiceClient &clie
 	}
 
 }
+void waitKey(){
+  std::cout << "Press any key to continue..." << std::endl; 
+
+  // Set terminal to raw mode 
+  system("stty raw"); 
+
+  // Wait for single character 
+  char input = getchar(); 
+
+  // Echo input:
+  std::cout << "--" << input << "--"<<std::endl;
+
+  // Reset terminal to normal "cooked" mode 
+  system("stty cooked"); 
+
+  // And we're out of here 
+}
+
+
 int main(int argc, char** argv){
 ros::init(argc, argv, "my_node_name");
 ros::NodeHandle nh;
@@ -148,9 +169,14 @@ const char *dir_path = pic_folder_path.c_str();
 		std::cout << "Success" << "\n";
 	}
 
+float vel = ((float) atoi(argv[5]))/10000;
 int direction = atoi(argv[1]);
 std::string pointID = "";
-int rows = 50;
+int rows_init = atoi(argv[3]);
+std::cout<<"init: "<<rows_init <<std::endl;
+int rows_goal = atoi(argv[4]);
+std::cout<<"goal: "<<rows_goal <<std::endl;
+
 std::ostringstream ss;
 ss.str("");
 //int col = atoi(argv[2]);
@@ -158,7 +184,7 @@ ss.str("");
  std::string col_str(argv[2]);
 std::cout<<"col: "<< col_str<<std::endl;
 if (direction == 9){
-	for (int i = 10; i <= rows; i+=1 ){
+	for (int i = rows_init; i <= rows_goal; i+=1 ){
 		ss.str("");
 		ss << i;
 		ss << "_";
@@ -167,9 +193,10 @@ if (direction == 9){
 std::cout<<"pointID: "<<pointID<<std::endl;
 		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
 		moveCamera( M_PI/2 , client_moveJoint);
-		if (i==rows)
+		if (i==rows_goal)
 			break;
-		move(0.1, 0.05, client_moveVel);
+
+		move(0.1, vel, client_moveVel);
 		// ss.str("");
 		// int col = atoi(argv[2]);
 		// ss<<col;
@@ -177,7 +204,7 @@ std::cout<<"pointID: "<<pointID<<std::endl;
 	}
 }
 if (direction == 0){
-	for (int i = rows; i >= 10; i-=1 ){
+	for (int i = rows_init; i >= rows_goal; i-=1 ){
                 ss.str("");
                 ss << i;
                 ss << "_";
@@ -185,9 +212,9 @@ if (direction == 0){
 		pointID = ss.str();
 		handlePoint(direction, pointID, client_capture, client_moveJoint, pic_folder_path);
 		moveCamera( M_PI/2 , client_moveJoint);
-		if (i==10)
+		if (i==rows_goal)
 			break;
-		move(0.1, 0.05, client_moveVel);
+		move(0.1, vel, client_moveVel);
 		// ss.str("");
 		// int col = atoi(argv[2]);
 		// ss<<col;
