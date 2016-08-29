@@ -2,13 +2,13 @@
 <!DOCTYPE catalog SYSTEM "catalog.dtd">
 <QRcodes>
 <QR>
-<x>2</x>
-<y>2</y>
+<x>4.9</x>
+<y>6.21</y>
 <z>0</z>
 
 <ox>0</ox>
 <oy>0</oy>
-<oz>0</oz>
+<oz>0.0</oz>
 <ow>1</ow>
 
 <label>Door 2</label>
