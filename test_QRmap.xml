@@ -1,52 +1,84 @@
 <?xml version="1.0"?>
 <!DOCTYPE catalog SYSTEM "catalog.dtd">
 <QRcodes>
+<!--- ||||||||||||||||||||   -->
 <QR>
-<x>4.9</x>
-<y>6.21</y>
-<z>0</z>
+<x>0.066</x>
+<y>1.7</y>
+<z>0.54</z> 
+<ox>0.49999984</ox>  
+<oy>0.49960184</oy>  
+<oz>0.49999984</oz>  
+<ow>0.50039816</ow>
 
-<ox>0</ox>
-<oy>0</oy>
-<oz>0.0</oz>
-<ow>1</ow>
-
-<label>Door 2</label>
+<label>Wall</label>
+<!--- ||||||||||||||||||||   -->
 </QR>
 <QR>
-<x>0</x>
-<y>0</y>
-<z>0</z>
+<x>0.0727</x>
+<y>1.963</y>
+<z>0.555</z>
 
-<ox>0</ox>
-<oy>0</oy>
-<oz>0</oz>
-<ow>1</ow>
+<ox>0.49999984</ox>
+<oy>0.49960184</oy>
+<oz>0.49999984</oz>
+<ow>0.50039816</ow>
 
-<label>"Door 3"</label>
+<label>Door</label>
+<!--- ||||||||||||||||||||   -->
 </QR>
 <QR>
-<x>0</x>
-<y>0</y>
-<z>0</z>
+<x>2.5097</x>
+<y>0.44</y>
+<z>0.825</z>
 
-<ox>0</ox>
-<oy>0</oy>
-<oz>0</oz>
-<ow>1</ow>
+<ox>0.00056</ox>
+<oy>0.706</oy>
+<oz>0.707</oz>
+<ow>0.000563</ow>
 
-<label>"example3"</label>
+<label>Microwave</label>
+<!--- ||||||||||||||||||||   -->
 </QR>
 <QR>
-<x>0</x>
-<y>0</y>
-<z>0</z>
+<x>0.256</x>
+<y>0.534</y>
+<z>0.32</z>
 
-<ox>0</ox>
-<oy>0</oy>
-<oz>0</oz>
-<ow>1</ow>
+<ox>0.00056</ox>
+<oy>0.707</oy>
+<oz>0.707</oz>
+<ow>0.00056</ow>
 
-<label>"example4"</label>
+<label>Wardrobe</label>
+</QR>
+<!--- ||||||||||||||||||||   -->
+</QR>
+<QR>
+<x>3.306</x>
+<y>0.6173</y>
+<z>0.75</z>
+
+<ox>0.00056</ox>
+<oy>0.707</oy>
+<oz>0.707</oz>
+<ow>0.00056</ow>
+
+<label>Fridge</label>
+</QR>
+<!--- ||||||||||||||||||||   -->
+</QR>
+<QR>
+<x>4.04</x>
+<y>0.697</y>
+<z>0.505</z>
+
+<ox>0.00056</ox>
+<oy>0.707</oy>
+<oz>0.707</oz>
+<ow>0.00056</ow>
+
+<label>Stable object</label>
 </QR>
 </QRcodes>
+
