@@ -112,7 +112,7 @@ void RappMoveBase::recoveryBehavior(bool &comp_vel_status, geometry_msgs::Twist 
 }
   bool RappMoveBase::MoveAlongPath_handler(elektron_msgs::MoveAlongPath::Request &req, elektron_msgs::MoveAlongPath::Response &resp)
   {
-    // costmap_->resume();
+    costmap_->resume();
 
     std::vector<geometry_msgs::PoseStamped> req_path_obj;
     req_path_obj = req.poses;
