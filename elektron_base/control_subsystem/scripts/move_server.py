@@ -268,6 +268,14 @@ class MoveElektronModule():
 				path_req = MoveAlongPathRequest()
 				pose_zero = PoseStamped()
 				pose_req = PoseStamped()
+		                robotCurrentPosition = self.getRobotCurrentPosition()
+
+                                pose_zero.header.frame_id = "map"
+                                pose_zero.pose.position.x = robotCurrentPosition[0][0]
+                                pose_zero.pose.position.y = robotCurrentPosition[0][1]
+                                pose_zero.pose.position.z = robotCurrentPosition[0][2]
+                                pose_zero.pose.orientation = tf.transformations.quaternion_from_euler(robotCurrentPosition[1][0],robotCurrentPosition[1][1],robotCurrentPosition[1][2])
+
 				pose_req.header.frame_id = "base_link"
 				pose_req.pose.position.x = req.x
 				pose_req.pose.position.y = req.y
@@ -276,11 +284,20 @@ class MoveElektronModule():
 				print "requested = ",req.theta
 				pose_in_map = self.transformPose("/map", pose_req,time)
 				path_req.poses = [pose_zero, pose_in_map]
-				resp = self.handle_rapp_MoveAlongPath(path_req)
+			
+				rospy.wait_for_service('rapp_moveAlongPath_ros')
+    				try:
+        				move_along_ros = rospy.ServiceProxy('rapp_moveAlongPath_ros', MoveAlongPath)
+        				resp1 = move_along_ros(path_req)
+        				status = False
+    				except rospy.ServiceException, e:
+        				print "Service call failed: %s"%e
+					status = True
+				#resp = self.handle_rapp_MoveAlongPath(path_req)
 
-				self.unsubscribeToObstacle()
+				#self.unsubscribeToObstacle()
 
-				status = resp.status
+				#status = resp.status
 				return MoveToResponse(status)
 			else:
 				status = True
