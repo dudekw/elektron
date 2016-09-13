@@ -1,0 +1,14 @@
+<launch>
+ <arg name="nodelet_manager_name" value="nodelet_manager"/>
+        <arg name="publish_nav_vel_topic" value="/mux_vel_nav/cmd_vel"/>
+
+        <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" args="manager" />
+
+	    <node pkg="nodelet" type="nodelet" name="yocs_cmd_vel_mux" args="load yocs_cmd_vel_mux/CmdVelMuxNodelet $(arg nodelet_manager_name)">
+                <param name="yaml_cfg_file" value="$(find elektron_navigation)/param/cmd_mux_config.yaml"/>
+                <remap from="/yocs_cmd_vel_mux/mux_vel_keyboard/cmd_vel" to="/mux_vel_keyboard/cmd_vel"/>
+                <remap from="/yocs_cmd_vel_mux/mux_vel_nav/cmd_vel" to="$(arg publish_nav_vel_topic)"/>
+                <remap from="/yocs_cmd_vel_mux/mux_vel_raw/cmd_vel" to="/mux_vel_raw/cmd_vel"/>
+                <remap from="/cmd_vel_absolute" to="/cmd_vel_absolute"/>
+</node>
+</launch>
