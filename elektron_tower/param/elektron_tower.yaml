@@ -1,1 +1,1 @@
-elektron_tower_device: '/dev/ttyUSB1'
+elektron_tower_device: '/dev/servo_head_ctrl'
