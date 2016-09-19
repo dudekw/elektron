@@ -9,7 +9,10 @@
 
 	<include file="$(find elektron_bringup)/launch/includes/elektron_agent.launch" />
 	<include file="$(find elektron_bringup)/launch/includes/elektron_sensors.launch">
-</include>
+	</include>
+	<include file="$(find rapp_fake_robot)/launch/rapp_fake_robot.launch" />
+
+
 
 <!--	<include file="$(find elektron_control)/launch/real_elektron_Tower_control.launch.xml">
 <arg name="base" value="elektron"/>
