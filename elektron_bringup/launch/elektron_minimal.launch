@@ -1,6 +1,29 @@
 <launch>
-	
-	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch" />
-	<include file="$(find elektron_bringup)/launch/includes/elektron_sensors.launch" />
+	<arg name="tower" value="$(optenv ELEKTRON_TOWER True)"/>  <!--  Tower, NoTower  --> 
 
+	<include file="$(find elektron_bringup)/launch/includes/elektron_description.launch">
+	<arg name="base" value="elektron"/> <!-- only elektron -->
+	<arg name="laser"    value="$(optenv ELEKTRON_LASER Laser)"/> <!--  Laser, NoLaser   -->
+	<arg name="tower" value="$(arg tower)"/>  <!--  Tower, NoTower  --> 
+	<arg name="tower_sensor" value="$(optenv ELEKTRON_TOWER_SENSOR rgb)"/>  <!-- kinect, rgb  -->
+ 	<arg name="use_sim" value="0"/> <!-- 0 - physical robot | 1 - simulation -->
+	</include>
+
+	<include file="$(find elektron_bringup)/launch/includes/elektron_agent.launch" />
+
+	<include file="$(find elektron_bringup)/launch/includes/elektron_sensors.launch">
+		<arg name="tower" value="$(arg tower)"/>
+		<arg name="netusb" value="0"/>
+	</include>
+<!--	<include file="$(find rapp_fake_robot)/launch/rapp_fake_robot.launch" />
+-->
+
+
+<!--	<include file="$(find elektron_control)/launch/real_elektron_Tower_control.launch.xml">
+<arg name="base" value="elektron"/>
+</include> -->
+
+
+<!--	<include file="$(find elektron_bringup)/launch/includes/elektron_ekf.launch" />
+	<include file="$(find elektron_bringup)/launch/includes/elektron_diagnostics.launch" /> -->
 </launch>

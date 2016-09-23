@@ -20,7 +20,7 @@ import sys, os
 import rospy
 import numpy 
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
-from geometry_msgs.msg import PolygonStamped, Point32, PointStamped
+from geometry_msgs.msg import PolygonStamped, Point32, PointStamped, Quaternion
 
 import tf
 import threading 
@@ -236,14 +236,17 @@ class MoveElektronModule():
 
 	def transformPose(self,target_frame,pose,time):
 		r = PoseStamped()
+		q = Quaternion()
+		q_eu = Quaternion()
+		pose_eu = Quaternion()
 		self.tl.waitForTransform(target_frame,pose.header.frame_id,time, rospy.Duration(5))
 		point_translation_upper,point_rotation_upper = self.tl.lookupTransform(target_frame,pose.header.frame_id,time)
-		print "rot transform = ", point_rotation_upper		
+
 		transform_matrix = numpy.dot(tf.transformations.translation_matrix(point_translation_upper), tf.transformations.quaternion_matrix(point_rotation_upper))
 		xyz = tuple(numpy.dot(transform_matrix, numpy.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 1.0])))[:3]
 		q = tf.transformations.quaternion_from_matrix(transform_matrix)
-		print "matrix = ", transform_matrix
-		print "q = ", q
+
+
 		q_eu = tf.transformations.euler_from_quaternion(q)
 		pose_eu = tf.transformations.euler_from_quaternion(pose.pose.orientation)
 		new_theta = q_eu[2] + pose_eu[2]
@@ -252,44 +255,42 @@ class MoveElektronModule():
 		r.header.stamp = pose.header.stamp 
 		r.header.frame_id = target_frame 
 		r.pose.position = geometry_msgs.msg.Point(*xyz) 
-		r.pose.orientation.x = q_end[0]
-		r.pose.orientation.y = q_end[1]
-		r.pose.orientation.z = q_end[2]
-		r.pose.orientation.w = q_end[3]
-		print "from pose = ",r
+		r.pose.orientation = Quaternion(q_end[0],q_end[1],q_end[2],q_end[3])
+
 		return r
 	def handle_rapp_moveTo(self,req):
 		try:
 			time = rospy.Time()
 			
 			
-			if(self.tl.canTransform("map", "base_link", rospy.Time())):
+			if(self.tl.canTransform("odom", "base_link", rospy.Time())):
 				self.subscribeToObstacle()
 				path_req = MoveAlongPathRequest()
 				pose_zero = PoseStamped()
 				pose_req = PoseStamped()
+				pose_in_map =  PoseStamped()
 		                robotCurrentPosition = self.getRobotCurrentPosition()
 
-                                pose_zero.header.frame_id = "map"
-                                pose_zero.pose.position.x = robotCurrentPosition[0][0]
-                                pose_zero.pose.position.y = robotCurrentPosition[0][1]
-                                pose_zero.pose.position.z = robotCurrentPosition[0][2]
-                                pose_zero.pose.orientation = tf.transformations.quaternion_from_euler(robotCurrentPosition[1][0],robotCurrentPosition[1][1],robotCurrentPosition[1][2])
+                                pose_zero.header.frame_id = "odom"
+                                pose_zero.pose.position = geometry_msgs.msg.Point(robotCurrentPosition[0][0],robotCurrentPosition[0][1],robotCurrentPosition[0][2])
+                                zero_orientation = tf.transformations.quaternion_from_euler(robotCurrentPosition[1][0],robotCurrentPosition[1][1],robotCurrentPosition[1][2])                           
+				pose_zero.pose.orientation = Quaternion(zero_orientation[0],zero_orientation[1],zero_orientation[2],zero_orientation[3])
 
 				pose_req.header.frame_id = "base_link"
-				pose_req.pose.position.x = req.x
-				pose_req.pose.position.y = req.y
-				pose_req.pose.position.z = 0
+
+				pose_req.pose.position = geometry_msgs.msg.Point(req.x,req.y, 0)
 				pose_req.pose.orientation = tf.transformations.quaternion_from_euler(0,0,req.theta)
-				print "requested = ",req.theta
-				pose_in_map = self.transformPose("/map", pose_req,time)
+				#print "requested = ",req.theta
+				pose_in_map = self.transformPose("/odom", pose_req,time)
+				#print "returned: ", pose_in_map
 				path_req.poses = [pose_zero, pose_in_map]
 			
 				rospy.wait_for_service('rapp_moveAlongPath_ros')
-    				try:
+    				try:	
         				move_along_ros = rospy.ServiceProxy('rapp_moveAlongPath_ros', MoveAlongPath)
-        				resp1 = move_along_ros(path_req)
-        				status = False
+
+					resp1 = move_along_ros(path_req.poses)
+					status = False
     				except rospy.ServiceException, e:
         				print "Service call failed: %s"%e
 					status = True

@@ -9,7 +9,7 @@
                 <param name="maxAngularSpeed" type="double" value="0.87" />
         </node> 
 
- 	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" />
+ 	<node name="virtual_effector_tower_controller" pkg="elektron_base" type="tower_controller.py" if="$(arg tower)" />
 
  	<node name="laser_scan_matcher" pkg="laser_scan_matcher" type="laser_scan_matcher_node">
 	        <param name="publish_pose_stamped" type="bool" value="true" />
@@ -22,13 +22,13 @@
 
   	<node name="control_subsystem_estimator" pkg="elektron_base" type="estimator_server.py" />
 
-	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" />
+	<rosparam command="load" file="$(find elektron_tower)/param/elektron_tower.yaml" if="$(arg tower)"/>
 
-  	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" output="screen" respawn="true">
+  	<node name="real_effector_tower" pkg="elektron_tower" type="elektron_tower_real_effector" output="screen" respawn="true" if="$(arg tower)">
 		<param name="/real_effector_tower/elektron_tower_device" value="/dev/ttyUSB1"/>
 	</node>
   	
-	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" output="screen" respawn = "true"/>
+	<node name="virtual_receptor_head_camera" pkg="elektron_base" type="cameras_controller.py" args="'head_camera' 1 0 0" if="$(arg tower)" output="screen" respawn = "true"/>
 
 	<include file="$(find elektron_bringup)/launch/includes/elektron_base.launch"/>
 	

@@ -5,29 +5,29 @@
 	xmlns:xacro="http://ros.org/wiki/fixme"
 	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
 	<property name="M_PI" value="3.14159"/>
-	<property name="elektron_control_input" value="pid" /> <!-- diff_drive_controller | pid -->
+	<property name="elektron_control_input" value="1" /> <!-- 0 = diff_drive_controller | 1 = pid -->
 
 	<property name="base_size_x" value="0.38" />
 	<property name="base_size_y" value="0.28" />
 	<property name="base_size_z" value="0.18" />
-	<xacro:arg name="use_sim" default="true" />
 	<property name="wheel_radius" value="0.05" />
 	<property name="wheel_length" value="0.02" />
 	<property name="caster_wheel_offset_y" value="0.1675" />
 	<!-- INCLUDE SICK LMX100 LASER -->
 	<xacro:include filename="$(find elektron_description)/urdf/sensors/sick_laser_lmx_100.urdf" />
-	<!-- INCLUDE KINECT -->
+	<!-- INCLUDE KINECT 
 	<xacro:include filename="$(find elektron_description)/urdf/sensors/kinect.urdf.xacro"/>
-	<!-- INCLUDE TOWER 
-	<xacro:include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>-->
-  	<!-- include calibrated params -->
+	-->
+	<!-- INCLUDE TOWER
+	<xacro:include filename="$(find elektron_description)/urdf/tower/tower.urdf.xacro"/>
+  	-->
+	<!-- include calibrated params -->
     <xacro:include filename="$(find elektron_description)/urdf/elektron_properties.urdf.xacro"/>
-  	<!-- include gazebo control -->
-	<xacro:if value="$(arg use_sim)">
-		<xacro:include filename="$(find elektron_gazebo)/urdf/elektron_gazebo_control.urdf.xacro"/>
-		<!--<xacro:include filename="$(find elektron_gazebo)/urdf/tower_gazebo_control.urdf.xacro"/>-->
+  	
+	<!-- include gazebo control -->
+		<xacro:include filename="$(find elektron_control)/urdf/elektron_control.urdf.xacro"/>
+		<xacro:include filename="$(find elektron_control)/urdf/tower_control.urdf.xacro"/>
  			
-	</xacro:if>
 
 	<!-- ROBOT BASE DEFINITION -->
 	<link name="base_link">
@@ -57,10 +57,10 @@
 
 		</collision>
 	</link>
-	<!-- WHEELS MACRO -->
-	<xacro:macro name="erratic_wheel" params="suffix parent reflect offset m mimic">
+<!-- WHEELS MACRO -->
+	<xacro:macro name="erratic_wheel" params="suffix parent reflect offset m mimic mimic_wheel">
 		
-			<joint name="${parent}_${suffix}_wheel_joint" type="continuous">
+			<joint name="${parent}_${suffix}_wheel_joint" type="fixed">
 				<origin xyz="${offset} ${reflect*caster_wheel_offset_y} ${wheel_radius}" rpy="0	0 0"/>
 				<axis xyz="0 1 0" />
 				<anchor xyz="0 0 0" />
@@ -69,12 +69,10 @@
 				<parent link="${parent}" />
 				<child link="${parent}_${suffix}_wheel_link" />
 	 			<dynamics damping="0.0" friction="0.0"/>
-	 			<xacro:if value="${mimic == 'left'}">
-		 			<mimic joint="${parent}_${mimic}_wheel_joint"/>					
+	 			<xacro:if value="${mimic}">
+		 			<mimic joint="${parent}_${mimic_wheel}_wheel_joint"/>					
 				</xacro:if>
-	 			<xacro:if value="${mimic == 'right'}">
-		 			<mimic joint="${parent}_${mimic}_wheel_joint"/>					
-				</xacro:if>
+
 			</joint>
 
 			<link name="${parent}_${suffix}_wheel_link">
@@ -111,16 +109,16 @@
 	</xacro:macro>
 
 	<!-- WHEELS DEFINITION -->
-	<xacro:erratic_wheel suffix="left" parent="base_link" reflect="1" offset="0" m="0.900" mimic="none"/>
-	<xacro:erratic_wheel suffix="left_front" parent="base_link" reflect="1" offset="0.15" m="0" mimic="left"/>
-	<xacro:erratic_wheel suffix="left_rear" parent="base_link" reflect="1" offset="-0.15" m="0" mimic="left"/>
+	<xacro:erratic_wheel suffix="left" parent="base_link" reflect="1" offset="0" m="0.900" mimic="0" mimic_wheel="left"/>
+	<xacro:erratic_wheel suffix="left_front" parent="base_link" reflect="1" offset="0.15" m="0" mimic="1" mimic_wheel="left"/>
+	<xacro:erratic_wheel suffix="left_rear" parent="base_link" reflect="1" offset="-0.15" m="0" mimic="1" mimic_wheel="left"/>
 
-	<xacro:erratic_wheel suffix="right" parent="base_link" reflect="-1" offset="0" m="0.900" mimic="none"/>
+	<xacro:erratic_wheel suffix="right" parent="base_link" reflect="-1" offset="0" m="0.900" mimic="0" mimic_wheel="left"/>
 	<xacro:erratic_wheel suffix="right_front" parent="base_link" reflect="-1" offset="0.15"
-		m="0" mimic="right"/>
-	<xacro:erratic_wheel suffix="right_rear" parent="base_link" reflect="-1" offset="-0.15"	m="0" mimic="right"/>
+		m="0" mimic="1" mimic_wheel="right" />
+	<xacro:erratic_wheel suffix="right_rear" parent="base_link" reflect="-1" offset="-0.15"	m="0" mimic="1" mimic_wheel="right"/>
 
-<!-- ADD KINECT -->   
+<!-- ADD KINECT     
     <joint name="bottom_kinect_joint" type="fixed">
       <origin xyz="${kinect_px} ${kinect_py} ${kinect_pz}" rpy="${kinect_or} ${kinect_op} ${kinect_oy}"/>
       <parent link="base_link"/>
@@ -129,15 +127,15 @@
     <link name="bottom_kinect_link"/>
 
 	<sensor_kinect parent="bottom_kinect_link" id="bottom"/>
-	<!-- ADD TOWER -->
-	<!-- <elektron_tower parent="base_link" camera_type="rgb_camera" id="1"/> camera_type avaliable: kinect | rgb_camera 
-	<tower_PID_control_gazebo/>-->
-
+ADD TOWER
+	<elektron_tower parent="base_link" camera_type="0" id="1"/> camera_type avaliable: 1 = kinect | 0 = rgb_camera
+	<tower_PID_control_gazebo/>
+-->
 	<!-- SET gazebo-ROS CONTROL -->
-	<xacro:if value="${elektron_control_input == 'pid'}">
+	<xacro:if value="${elektron_control_input}">
 		<elektron_PID_control_gazebo/>
 	</xacro:if>
-	<xacro:if value="${elektron_control_input == 'diff_drive_controller'}">
+	<xacro:unless value="${elektron_control_input}">
 		<gazebo>
 		<plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
 			<alwaysOn>true</alwaysOn>
@@ -153,6 +151,6 @@
 			<robotBaseFrame>base_link</robotBaseFrame>
 		</plugin>
 	</gazebo>
-	</xacro:if>
+	</xacro:unless>
 
 </robot>
