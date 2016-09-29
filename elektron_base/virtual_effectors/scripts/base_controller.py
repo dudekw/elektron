@@ -101,18 +101,18 @@ class BaseEffectorModule():
 ####
 
 	def rapp_set_vel_interface(self,req):
-		if (req.velocity_x == 0 and req.velocity_theta == 0):
-			req_stop = MoveStopRequest()
-			status = self.rapp_stop_vel_interface(req_stop)
+#		if (req.velocity_x == 0 and req.velocity_theta == 0):
+#			req_stop = MoveStopRequest()
+#			status = self.rapp_stop_vel_interface(req_stop)
+#
+#			return MoveVelResponse(status.status)
+#		else:
+		self.set_vel.linear.x = req.velocity_x
+		self.set_vel.angular.z = req.velocity_theta
+		self.trigger_publishing = True
 
-			return MoveVelResponse(status.status)
-		else:
-			self.set_vel.linear.x = req.velocity_x
-			self.set_vel.angular.z = req.velocity_theta
-			self.trigger_publishing = True
-
-			status = False
-			return MoveVelResponse(status)
+		status = False
+		return MoveVelResponse(status)
 	def rapp_stop_vel_interface(self,req):
 		self.set_vel.linear.x = 0
 		self.set_vel.angular.z = 0
