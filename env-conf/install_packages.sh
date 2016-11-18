@@ -28,5 +28,6 @@ sudo apt-get install -y ros-indigo-xacro;
 sudo apt-get install -y ros-indigo-robot-state-publisher;
 sudo apt-get install -y ros-indigo-scan-tools;
 sudo apt-get install -y ros-indigo-yocs-cmd-vel-mux;
+sudo apt-get install -y ros-indigo-navigation;
 
 
