@@ -29,5 +29,6 @@ sudo apt-get install ros-kinetic-robot-state-publisher;
 sudo apt-get install ros-kinetic-scan-tools;
 sudo apt-get install ros-kinetic-yocs-cmd-vel-mux;
 sudo apt-get install ros-kinetic-navigation;
+sudo apt-get install ros-kinetic-gmapping;
 
 
