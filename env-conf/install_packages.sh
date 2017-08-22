@@ -30,3 +30,4 @@ sudo apt-get install -y ros-kinetic-scan-tools;
 sudo apt-get install -y ros-kinetic-yocs-cmd-vel-mux;
 sudo apt-get install -y ros-kinetic-navigation;
 sudo apt-get install -y ros-kinetic-gmapping;
+sudo apt-get install -y ros-kinetic-cv-bridge;
