@@ -3,8 +3,11 @@ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main
 wget -O install_packages.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install_packages.sh;
 bash install_packages.sh
 
-sudo apt-get install -y libgazebo7-dev;
-sudo apt-get install -y gazebo7;
+echo -n "Do you wish to install gazebo7 from source? (y/n) "
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+    wget -O install_elektron_gazebo.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install-elektron-gazebo.sh && bash install_elektron_gazebo.sh;
+fi
 
 mkdir -p ~/rapp/robots/src;
 cd ~/rapp/robots/src;
@@ -31,4 +34,3 @@ else
 	catkin config --install;
 	catkin build
 fi
-
