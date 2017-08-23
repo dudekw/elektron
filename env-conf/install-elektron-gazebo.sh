@@ -18,7 +18,7 @@ function printError {
     echo -e "${RED}$1${NC}"
 }
 
-build_dir="~/gazebo_ws"
+build_dir="/$HOME/gazebo_ws"
 
 distro="$ROS_DISTRO"
 
