@@ -19,7 +19,7 @@ if [ -d "elektron" ]; then
         cd ~/rapp/robots/src/elektron;
         git pull;
 else
-        git clone https://github.com/dudekw/elektron.git;
+        git clone -b kinetic https://github.com/dudekw/elektron.git;
 fi
 
 cd ~/rapp/robots/src/elektron;
