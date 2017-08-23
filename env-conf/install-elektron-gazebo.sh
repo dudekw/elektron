@@ -49,6 +49,8 @@ installed=(
 "libgts-dev"
 "libfcl-dev"
 "libassimp-dev"
+"libsimbody-dev"
+"libogre-1.9-dev"
 "ros-kinetic-diagnostic-updater"
 )
 
