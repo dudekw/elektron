@@ -7,6 +7,7 @@ sudo sh -c '. /etc/lsb-release && echo "deb http://packages.ros.org.ros.informat
 wget -O install_packages.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install_packages.sh;
 bash install_packages.sh
 
+source /opt/ros/kinetic/setup.bash;
 printf "${YELLOW}Do you wish to install gazebo7 from source?${NC} (y/n) \n"
 read answer
 if echo "$answer" | grep -iq "^y" ;then
