@@ -4,14 +4,14 @@ YELLOW='\033[1;33m';
 NC='\033[0m';
 
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-#wget -O install_packages.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install_packages.sh;
-#bash install_packages.sh
+wget -O install_packages.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install_packages.sh;
+bash install_packages.sh
 
 printf "${YELLOW}Do you wish to install gazebo7 from source?${NC} (y/n) \n"
 read answer
-#if echo "$answer" | grep -iq "^y" ;then
-#    wget -O install_elektron_gazebo.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install-elektron-gazebo.sh && bash install_elektron_gazebo.sh;
-#fi
+if echo "$answer" | grep -iq "^y" ;then
+    wget -O install_elektron_gazebo.sh https://raw.githubusercontent.com/dudekw/elektron/kinetic/env-conf/install-elektron-gazebo.sh && bash install_elektron_gazebo.sh;
+fi
 
 mkdir -p ~/rapp/robots/src;
 cd ~/rapp/robots/src;
