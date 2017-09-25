@@ -142,7 +142,8 @@ install(DIRECTORY meshes/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/meshes )
 install(DIRECTORY urdf/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf )
-
+install(DIRECTORY maps/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/maps )
 #############
 ## Testing ##
 #############

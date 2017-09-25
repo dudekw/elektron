@@ -10,20 +10,18 @@ tower:
     pid: {p: 100.0, i: 10.1, d: 20.0}
 
 elektron:
-  # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 50  
-
+    publish_rate: 50
   # Position Controllers ---------------------------------------
   left_wheel_position_controller:
     type: effort_controllers/JointPositionController
     joint: base_link_left_wheel_joint
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+    pid: {p: 100.0, i: 0.1, d: 10.0}
   right_wheel_position_controller:
     type: effort_controllers/JointPositionController
     joint: base_link_right_wheel_joint
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+    pid: {p: 100.0, i: 0.1, d: 10.0}
 
   mobile_base_controller:
     type        : "diff_drive_controller/DiffDriveController"
