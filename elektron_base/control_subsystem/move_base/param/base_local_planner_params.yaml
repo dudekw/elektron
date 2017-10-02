@@ -14,9 +14,9 @@ my_dwa_planner:
   sim_time: 3.0
   sim_granularity: 0.05
   
-  xy_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.05
   yaw_goal_tolerance: 0.1
   latch_xy_goal_tolerance: true
   
   vx_samples: 10
-  controller_frequency: 5
+controller_frequency: 5
