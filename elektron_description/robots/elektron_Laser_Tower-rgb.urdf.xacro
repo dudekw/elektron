@@ -107,11 +107,11 @@
 	</xacro:macro>
 
 	<!-- WHEELS DEFINITION -->
-	<xacro:erratic_wheel suffix="left" parent="base_link" reflect="1" offset="0" m="0.900" mimic="0" mimic_wheel="left"/>
+	<xacro:erratic_wheel suffix="left" parent="base_link" reflect="1" offset="0" m="1.900" mimic="0" mimic_wheel="left"/>
 	<xacro:erratic_wheel suffix="left_front" parent="base_link" reflect="1" offset="0.15" m="0" mimic="1" mimic_wheel="left"/>
 	<xacro:erratic_wheel suffix="left_rear" parent="base_link" reflect="1" offset="-0.15" m="0" mimic="1" mimic_wheel="left"/>
 
-	<xacro:erratic_wheel suffix="right" parent="base_link" reflect="-1" offset="0" m="0.900" mimic="0" mimic_wheel="left"/>
+	<xacro:erratic_wheel suffix="right" parent="base_link" reflect="-1" offset="0" m="1.900" mimic="0" mimic_wheel="left"/>
 	<xacro:erratic_wheel suffix="right_front" parent="base_link" reflect="-1" offset="0.15"
 		m="0" mimic="1" mimic_wheel="right" />
 	<xacro:erratic_wheel suffix="right_rear" parent="base_link" reflect="-1" offset="-0.15"	m="0" mimic="1" mimic_wheel="right"/>
